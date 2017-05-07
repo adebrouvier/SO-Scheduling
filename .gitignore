@@ -1,33 +1,39 @@
-# Object files
-*.o
-*.ko
-*.obj
-*.elf
+# Compiled class file
+*.class
 
-# Precompiled Headers
-*.gch
-*.pch
+# Log file
+*.log
 
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
+# BlueJ files
+*.ctxt
 
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
 
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
 
-# Debug files
-*.dSYM/
-*.su
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+target/
