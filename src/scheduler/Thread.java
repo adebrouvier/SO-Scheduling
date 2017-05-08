@@ -2,20 +2,20 @@ package scheduler;
 
 public class Thread {
 
-    private String type;
+    private ThreadType type;
     private Integer[] processingTime;
 
-    public Thread(String type, Integer[] processingTime) {
+    public Thread(ThreadType type, Integer[] processingTime) {
         this.type = type;
         this.processingTime = processingTime;
 
     }
 
-    public String getType() {
+    public ThreadType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(ThreadType type) {
         this.type = type;
     }
 

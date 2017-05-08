@@ -15,12 +15,12 @@ public class Scheduler {
     private Integer cores;
 
     //Librería a utilizarse en los hilos ULT
-    private String threadLib;
+    private ThreadLibrary threadLib;
 
     //Tipo de planificación para los procesos
     private String planification;
 
-    public Scheduler(Process[] processes, String[] bursts, Integer cores, String threadLib, String planification) {
+    public Scheduler(Process[] processes, String[] bursts, Integer cores, ThreadLibrary threadLib, String planification) {
         this.processes = processes;
         this.bursts = bursts;
         this.cores = cores;
@@ -29,12 +29,11 @@ public class Scheduler {
     }
 
 
-    public void schedule() {
+    public void run() {
 
         for ( int t = 0 ; t < Integer.MAX_VALUE ; t++ ){
             //schedule
         }
-
 
     }
 }

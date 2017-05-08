@@ -1,4 +1,6 @@
-package scheduler;
+package scheduler.configuration;
+
+import scheduler.Process;
 
 public class Configuration {
 

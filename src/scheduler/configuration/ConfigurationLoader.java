@@ -1,8 +1,12 @@
-package scheduler;
+package scheduler.configuration;
+
+import org.apache.commons.cli.*;
+import scheduler.Process;
+import scheduler.Thread;
+import scheduler.ThreadType;
 
 import java.io.File;
 import java.util.Scanner;
-import org.apache.commons.cli.*;
 
 public class ConfigurationLoader {
 
@@ -86,7 +90,15 @@ public class ConfigurationLoader {
 
                 for (int j = 0; j<numberOfThreads[i] ; j++){
 
-                    String threadType = sc.next();
+                    String threadTypeInput = String.valueOf(sc.next().charAt(0));
+
+                    ThreadType type = null;
+
+                    if (threadTypeInput.equals(ThreadType.KLT.threadType))
+                        type=ThreadType.KLT;
+
+                    if (threadTypeInput.equals(ThreadType.ULT.threadType))
+                        type=ThreadType.ULT;
 
                     Integer[] burst = new Integer[bursts];
 
@@ -94,7 +106,7 @@ public class ConfigurationLoader {
                         burst[j] = sc.nextInt();
                     }
 
-                    Thread t = new Thread(threadType,burst);
+                    Thread t = new Thread(type,burst);
                     threadList[j]=t;
                 }
 
