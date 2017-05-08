@@ -6,13 +6,10 @@ public class Main {
 
         ConfigurationLoader cl = new ConfigurationLoader(args);
 
-        Thread t1 = new Thread("ult",new Integer[] {1,2,3});
+        Configuration cfg = cl.load();
 
-        Thread t2 = new Thread("ult", new Integer[] {3,2,3});
-
-        Process p1 = new Process(0,new Thread[] {t1,t2});
-
-        Scheduler scheduler  = new Scheduler(new Process[]{p1},2,3,"fifo","fifo");
+        Scheduler scheduler  = new Scheduler(cfg.getProcessList(),cfg.getBurstList(),2,
+                "fifo","fifo");
 
         scheduler.schedule();
     }

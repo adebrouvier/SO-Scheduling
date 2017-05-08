@@ -7,8 +7,8 @@ import org.apache.commons.cli.*;
 public class ConfigurationLoader {
 
     private String fileName = "./res/settings.so";
-    Integer processes;
-    Integer bursts;
+    private Integer processes;
+    private Integer bursts;
 
     public ConfigurationLoader(String [] args){
 
@@ -16,12 +16,15 @@ public class ConfigurationLoader {
         Options options = new Options();
 
         // add option
-        //@TODO: hacer required
-        options.addOption("p", true, "number of processes");
-        options.addOption("b", true, "number of bursts");
-        options.addOption("c", true, "number of cores");
-        options.addOption("pp", true, "process planification");
-        options.addOption("tl", true, "thread library");
+        String[] optionList = {"p","b","c","pp","tl"};
+        String[] optionDescriptions = {"number of processes","number of bursts","number of cores","process planification","thread library"};
+
+        for (int i = 0;i < optionList.length;i++) {
+            Option option = new Option(optionList[i], true, optionDescriptions[i]);
+            option.setArgs(1);
+            option.setRequired(true);
+            options.addOption(option);
+        }
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd;
@@ -47,25 +50,64 @@ public class ConfigurationLoader {
             // oops, something went wrong
             System.err.println( "Parsing failed.  Reason: " + exp.getMessage() );
         }
-
-        load();
     }
 
-    private void load (){
+    public Configuration load (){
 
         File file = new File(fileName);
+        Configuration config=new Configuration(null,null);
 
         try {
             Scanner sc = new Scanner(file);
 
+            Process[] processList = new Process[processes];
+
             for (int i = 0; i < processes; i++){
-                System.out.println("Arrival time: " +sc.next());
+                processList[i]=new Process( sc.nextInt(),null);
             }
+
+            int[] numberOfThreads = new int[processes];
+
+            for (int i = 0; i < processes; i++){
+                numberOfThreads[i]=sc.nextInt();
+            }
+
+            String[] burstType = new String[bursts];
+
+            for (int i = 0; i < bursts ; i++){
+                burstType[i]=sc.next();
+            }
+
+            config.setBurstList(burstType);
+
+            for (int i = 0; i<processes ; i++){
+
+                Thread[] threadList = new Thread[numberOfThreads[i]];
+
+                for (int j = 0; j<numberOfThreads[i] ; j++){
+
+                    String threadType = sc.next();
+
+                    Integer[] burst = new Integer[bursts];
+
+                    for (int k = 0; k<bursts ; k++){
+                        burst[j] = sc.nextInt();
+                    }
+
+                    Thread t = new Thread(threadType,burst);
+                    threadList[j]=t;
+                }
+
+                processList[i].setThreads(threadList);
+            }
+
+            config.setProcessList(processList);
 
         }catch (Exception e){
             e.printStackTrace();
         }
 
+        return config;
     }
 
 
