@@ -11,8 +11,8 @@ public class Main {
 
         Configuration cfg = cl.load();
 
-        Scheduler scheduler  = new Scheduler(cfg.getProcessList(),cfg.getBurstList(),1,
-                ThreadLibrary.FIFO,"fifo");
+        Scheduler scheduler  = new Scheduler(cfg.getProcessList(),cfg.getBurstList(),cfg.getCores(),cfg.getProcessPlanification(),
+                cfg.getThreadLibrary());
 
         scheduler.run();
     }

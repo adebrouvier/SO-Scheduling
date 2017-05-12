@@ -1,9 +1,9 @@
 package scheduler.configuration;
 
 import org.apache.commons.cli.*;
+import scheduler.*;
 import scheduler.Process;
 import scheduler.Thread;
-import scheduler.ThreadType;
 
 import java.io.File;
 import java.util.Scanner;
@@ -11,8 +11,11 @@ import java.util.Scanner;
 public class ConfigurationLoader {
 
     private String fileName = "./res/settings.so";
-    private Integer processes;
-    private Integer bursts;
+    private Integer processes = 1;
+    private Integer bursts = 1;
+    private ProcessPlanification processPlanification = ProcessPlanification.FIFO;
+    private ThreadLibrary threadLibrary = ThreadLibrary.FIFO;
+    private Integer cores=1;
 
     public ConfigurationLoader(String [] args){
 
@@ -33,6 +36,8 @@ public class ConfigurationLoader {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd;
         HelpFormatter formatter = new HelpFormatter();
+
+        //TODO: remove this line
         formatter.printHelp("scheduler",options);
 
         try {
@@ -50,36 +55,54 @@ public class ConfigurationLoader {
                 bursts=Integer.parseInt(pOption);
             }
 
+            if (cmd.hasOption("c")) {
+                pOption = cmd.getOptionValue("c");
+                cores=Integer.parseInt(pOption);
+            }
+
+            if (cmd.hasOption("pp")){
+                pOption = cmd.getOptionValue("pp");
+                processPlanification=ProcessPlanification.valueOf(pOption.toUpperCase());
+            }
+
+            if (cmd.hasOption("tl")){
+                pOption = cmd.getOptionValue("tl");
+                threadLibrary=ThreadLibrary.valueOf(pOption.toUpperCase());
+            }
+
         } catch (ParseException exp) {
             // oops, something went wrong
             System.err.println( "Parsing failed.  Reason: " + exp.getMessage() );
         }
     }
-
+    //TODO validation and exit (0)
     public Configuration load (){
 
         File file = new File(fileName);
-        Configuration config=new Configuration(null,null);
+        Configuration config = new Configuration(null,null, cores, threadLibrary, processPlanification);
 
         try {
             Scanner sc = new Scanner(file);
 
             Process[] processList = new Process[processes];
 
+            //Create process list
             for (int i = 0; i < processes; i++){
-                processList[i]=new Process( sc.nextInt(),null);
+                processList[i] = new Process( sc.nextInt(),null);
             }
 
             int[] numberOfThreads = new int[processes];
 
+            // Obtain number of threads for each process
             for (int i = 0; i < processes; i++){
-                numberOfThreads[i]=sc.nextInt();
+                numberOfThreads[i] = sc.nextInt();
             }
 
             String[] burstType = new String[bursts];
 
+            // Obtain burst type for each burst
             for (int i = 0; i < bursts ; i++){
-                burstType[i]=sc.next();
+                burstType[i] = sc.next();
             }
 
             config.setBurstList(burstType);
@@ -95,19 +118,19 @@ public class ConfigurationLoader {
                     ThreadType type = null;
 
                     if (threadTypeInput.equals(ThreadType.KLT.threadType))
-                        type=ThreadType.KLT;
+                        type = ThreadType.KLT;
 
                     if (threadTypeInput.equals(ThreadType.ULT.threadType))
-                        type=ThreadType.ULT;
+                        type = ThreadType.ULT;
 
                     Integer[] burst = new Integer[bursts];
 
-                    for (int k = 0; k<bursts ; k++){
-                        burst[j] = sc.nextInt();
+                    for (int k = 0; k < bursts ; k++){
+                        burst[k] = sc.nextInt();
                     }
 
                     Thread t = new Thread(type,burst);
-                    threadList[j]=t;
+                    threadList[j] = t;
                 }
 
                 processList[i].setThreads(threadList);
