@@ -1,5 +1,9 @@
 package scheduler;
 
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Clase principal
  */
@@ -9,10 +13,10 @@ public class Scheduler {
     private Process[] processes;
 
     //Ráfagas de ejecución
-    private String[] bursts;
+    private Burst[] bursts;
 
     //Procesadores
-    private Integer cores;
+    private Integer coreAmount;
 
     //Librería a utilizarse en los hilos ULT
     private ThreadLibrary threadLib;
@@ -20,38 +24,67 @@ public class Scheduler {
     //Tipo de planificación para los procesos
     private ProcessPlanification planification;
 
-    public Scheduler(Process[] processes, String[] bursts, Integer cores, ProcessPlanification planification, ThreadLibrary threadLib) {
+    private Queue<Process> readyQueue;
+
+    private Queue<Process> blockedQueue;
+
+    private Core[] cores;
+
+    private int time = 0;
+
+    public Scheduler(Process[] processes, Burst[] bursts, Integer coreAmount, ProcessPlanification planification, ThreadLibrary threadLib) {
         this.processes = processes;
         this.bursts = bursts;
-        this.cores = cores;
+        this.coreAmount = coreAmount;
         this.threadLib = threadLib;
         this.planification = planification;
+        this.readyQueue = new LinkedList<Process>();
+        this.blockedQueue = new LinkedList<Process>();
+        this.cores = new Core[coreAmount];
+        createCores();
+    }
+
+    private void createCores(){
+        for (int i = 0 ; i < coreAmount ; i++){
+            this.cores[i]=new Core();
+        }
     }
 
 
     public void run() {
 
-        checkParse();
+        //checkear io
 
-        for ( int t = 0 ; t < Integer.MAX_VALUE ; t++ ){
-            //schedule
+        //arrival time
+
+        while (true){
+
+            for (Core core : cores) {
+                if (!core.isRunning()) {
+                    System.out.println("hola");
+                }
+            }
+
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-
     }
 
     private void checkParse(){
 
         for (int i = 0 ; i< processes.length ; i++){
             System.out.println(processes[i].getArrivalTime());
-            Thread[] threads = processes[i].getThreads();
+            KernelLevelThread[] threads = processes[i].getThreads();
 
             for (int j = 0 ; j <threads.length ; j++){
-                System.out.println(threads[j].getType());
-                Integer[] processingTime = threads[j].getProcessingTime();
+                /*Integer[] processingTime = threads[j].getProcessingTime();
 
                 for (Integer time : processingTime){
                     System.out.println(time);
-                }
+                }*/
 
             }
         }

@@ -2,28 +2,26 @@ package scheduler;
 
 public class Thread {
 
-    private ThreadType type;
-    private Integer[] processingTime;
+    private Burst[] processingTime;
+    private Integer remainingTime;
 
-    public Thread(ThreadType type, Integer[] processingTime) {
-        this.type = type;
+    public Thread(){
+
+    }
+
+    public Thread(Burst[] processingTime) {
         this.processingTime = processingTime;
+        for(Burst b : processingTime) {
+            this.remainingTime += b.getTime();
+        }
 
     }
 
-    public ThreadType getType() {
-        return type;
-    }
-
-    public void setType(ThreadType type) {
-        this.type = type;
-    }
-
-    public Integer[] getProcessingTime() {
+    public Burst[] getProcessingTime() {
         return processingTime;
     }
 
-    public void setProcessingTime(Integer[] processingTime) {
+    public void setProcessingTime(Burst[] processingTime) {
         this.processingTime = processingTime;
     }
 
