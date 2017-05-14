@@ -2,27 +2,53 @@ package scheduler;
 
 public class Thread {
 
-    private Burst[] processingTime;
+    private Burst[] bursts;
+    private Integer currentBurst;
+
     private Integer remainingTime;
 
-    public Thread(){
-
-    }
+    private Integer affinity;
 
     public Thread(Burst[] processingTime) {
-        this.processingTime = processingTime;
+        this.bursts = processingTime;
         for(Burst b : processingTime) {
             this.remainingTime += b.getTime();
         }
-
     }
 
-    public Burst[] getProcessingTime() {
-        return processingTime;
+    /**
+     *
+     * @return true if current burst is finished
+     */
+    public boolean decreaseTime() {
+
+        boolean currentBurstFinished = bursts[currentBurst].decreaseTime();
+
+        remainingTime--;
+
+        if (currentBurstFinished) {
+            currentBurst = currentBurst++;
+            if (currentBurst == bursts.length) {
+
+            }
+            return true;
+//            if (currentBurst == bursts.length) // se ejecutó to do el thread
+//                return true;
+        }
+
+        return false;
     }
 
-    public void setProcessingTime(Burst[] processingTime) {
-        this.processingTime = processingTime;
+    public Burst[] getBursts() {
+        return bursts;
+    }
+
+    public void setBursts(Burst[] bursts) {
+        this.bursts = bursts;
+    }
+
+    public Integer getAffinity() {
+        return affinity;
     }
 
 

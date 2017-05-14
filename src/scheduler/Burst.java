@@ -1,7 +1,7 @@
 package scheduler;
 
 /**
- * Created by Tobias on 13/5/2017.
+ * TODO checkear burst limit (12)
  */
 public class Burst {
 
@@ -27,5 +27,17 @@ public class Burst {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    /**
+     *
+     * @return true if burst is finished
+     */
+    public boolean decreaseTime() {
+        if (time > 0) {
+            time--;
+            return false;
+        }
+        return true;
     }
 }

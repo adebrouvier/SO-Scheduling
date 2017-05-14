@@ -11,10 +11,10 @@ public class Main {
 
         Configuration cfg = cl.load();
 
-        Scheduler scheduler  = new Scheduler(cfg.getProcessList(),cfg.getBurstList(),cfg.getCores(),cfg.getProcessPlanification(),
-                cfg.getThreadLibrary());
+        //Scheduler scheduler  = new Scheduler(cfg.getProcessList(),cfg.getBurstList(),cfg.getCores(),cfg.getProcessPlanification(),
+        //        cfg.getThreadLibrary());
 
-        scheduler.run();
+        //scheduler.run();
     }
 
 }

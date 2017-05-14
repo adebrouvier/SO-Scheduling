@@ -1,69 +1,85 @@
 package scheduler;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Clase principal
+ * TODO ordenar los procesos por arrival time
+ * TODO checkear en el parseo que los bursts esten intercalados y que termine siempre con burst de cpu
  */
-public class Scheduler {
+public abstract class Scheduler {
 
     //Procesos a ejecutarse
-    private Process[] processes;
+    protected Process[] processes;
+    protected Integer next = 0;
 
     //Ráfagas de ejecución
-    private Burst[] bursts;
+    protected Burst[] bursts;
 
     //Procesadores
-    private Integer coreAmount;
+    protected Integer coreAmount;
 
     //Librería a utilizarse en los hilos ULT
-    private ThreadLibrary threadLib;
+    protected String threadLib;
 
-    //Tipo de planificación para los procesos
-    private ProcessPlanification planification;
+    protected Queue<Process> readyQueue;
 
-    private Queue<Process> readyQueue;
+    protected Queue<Process> blockedQueue;
 
-    private Queue<Process> blockedQueue;
+    protected Core[] cores;
 
-    private Core[] cores;
+    // Dispositivos IO
+    protected List<IO> IODevices;
 
-    private int time = 0;
 
-    public Scheduler(Process[] processes, Burst[] bursts, Integer coreAmount, ProcessPlanification planification, ThreadLibrary threadLib) {
+    protected int time = 0;
+
+    public Scheduler(Process[] processes, Burst[] bursts, Integer coreAmount, String threadLib, Integer ioCount) {
         this.processes = processes;
         this.bursts = bursts;
         this.coreAmount = coreAmount;
         this.threadLib = threadLib;
-        this.planification = planification;
-        this.readyQueue = new LinkedList<Process>();
-        this.blockedQueue = new LinkedList<Process>();
         this.cores = new Core[coreAmount];
-        createCores();
-    }
 
-    private void createCores(){
-        for (int i = 0 ; i < coreAmount ; i++){
-            this.cores[i]=new Core();
+        createCores();
+        IODevices = new ArrayList<>();
+
+        for (int i = 0; i < ioCount; i++) {
+            IODevices.add(new IO(i));
         }
     }
 
-
     public void run() {
 
-        //checkear io
+        while (true) {
+            //checkear io
 
-        //arrival time
+            for (IO io : IODevices) {
+                if (!io.isBusy()) {
+                    io.setCurrentProcess();
+                }
 
-        while (true){
-
-            for (Core core : cores) {
-                if (!core.isRunning()) {
-                    System.out.println("hola");
+                if (io.isBusy()) {
+                    if (io.getCurrentProcess().decreaseTime()) { // los procesos siempre terminan con burst de cpu entonces no es necesario checkear
+                        readyQueue.add(io.getCurrentProcess());
+                        io.poll();
+                    }
                 }
             }
+
+            //arrival time
+
+           // TODO processes.get(time);
+
+            while (processes[next].getArrivalTime() == time) {
+                //readyQueue.addAll(processes[next].getThreads()); //TODO FIX
+                next++;
+            }
+
+            executeAlgorithm();
 
             try {
                 TimeUnit.SECONDS.sleep(1);
@@ -73,21 +89,30 @@ public class Scheduler {
         }
     }
 
-    private void checkParse(){
+    public abstract void executeAlgorithm();
 
-        for (int i = 0 ; i< processes.length ; i++){
-            System.out.println(processes[i].getArrivalTime());
-            KernelLevelThread[] threads = processes[i].getThreads();
-
-            for (int j = 0 ; j <threads.length ; j++){
-                /*Integer[] processingTime = threads[j].getProcessingTime();
-
-                for (Integer time : processingTime){
-                    System.out.println(time);
-                }*/
-
-            }
+    private void createCores(){
+        for (int i = 0 ; i < coreAmount ; i++){
+            this.cores[i]= new Core(i);
         }
-
     }
+
+//    private void checkParse(){
+//
+//        for (int i = 0 ; i< processes.length ; i++){
+//            System.out.println(processes[i].getArrivalTime());
+//            KernelLevelThread[] threads = processes[i].getThreads();
+//
+//            for (int j = 0 ; j <threads.length ; j++){
+//                /*Integer[] processingTime = threads[j].getBursts();
+//
+//                for (Integer time : processingTime){
+//                    System.out.println(time);
+//                }*/
+//
+//            }
+//        }
+//
+//    }
+
 }

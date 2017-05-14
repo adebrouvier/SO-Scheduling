@@ -1,11 +1,15 @@
 package scheduler;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 
 public class Process {
 
     private Integer arrivalTime;
     private KernelLevelThread[] threads;
+
+    private Integer currentThreadIndex = -1;
 
     private Queue<Thread> readyQueue;
     private Queue<Thread> blockedQueue;
@@ -17,6 +21,20 @@ public class Process {
         this.threads = threads;
     }
 
+    /**
+     *
+     * @return true if burst of current thread is finished
+     */
+    public boolean decreaseTime() {
+        remainingTime--;
+        if (threads[currentThreadIndex].decreaseTime()) {
+            threads[currentThreadIndex] = null;
+
+        }
+
+        return false;
+    }
+
     public Integer getArrivalTime() {
         return arrivalTime;
     }
@@ -25,8 +43,14 @@ public class Process {
         this.arrivalTime = arrivalTime;
     }
 
-    public KernelLevelThread[] getThreads() {
-        return threads;
+    public List<KernelLevelThread> getThreads() {
+
+        List<KernelLevelThread> list = new ArrayList<>();
+        for (KernelLevelThread klt: threads) {
+            list.add(klt);
+        }
+
+        return list;
     }
 
     public void setThreads(KernelLevelThread[] threads) {

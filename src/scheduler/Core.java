@@ -6,6 +6,12 @@ public class Core {
 
     private Process currentProcess;
 
+    private Integer ID;
+
+    public Core(Integer id) {
+        this.ID = id;
+    }
+
     public boolean isRunning() {
         return running;
     }
@@ -22,6 +28,10 @@ public class Core {
         this.currentProcess = currentProcess;
         if (this.currentProcess != null)
             this.setRunning(true);
+    }
+
+    public Integer getID() {
+        return ID;
     }
 
 }
