@@ -5,7 +5,7 @@ public class Thread {
     private Burst[] bursts;
     private Integer currentBurst;
 
-    private Integer remainingTime;
+    private Integer remainingTime=0;
 
     private Integer affinity;
 

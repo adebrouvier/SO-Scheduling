@@ -1,24 +1,22 @@
 package scheduler.configuration;
 
 import scheduler.Process;
-import scheduler.ProcessPlanification;
-import scheduler.ThreadLibrary;
 
 public class Configuration {
 
     private Process[] processList;
-    private String[] burstList;
     private Integer cores;
-    private ThreadLibrary threadLibrary;
-    private ProcessPlanification processPlanification;
+    private String threadLibrary;
+    private String processPlanification;
+    private Integer IOCount;
 
-    public Configuration(Process[] processList, String[] burstList, Integer cores, ThreadLibrary threadLibrary, ProcessPlanification processPlanification) {
+    public Configuration(Process[] processList, Integer cores, String threadLibrary, String processPlanification, Integer IOCount) {
 
         this.processList = processList;
-        this.burstList = burstList;
         this.cores = cores;
         this.threadLibrary = threadLibrary;
         this.processPlanification = processPlanification;
+        this.IOCount = IOCount;
     }
 
     public Integer getCores() {
@@ -37,28 +35,27 @@ public class Configuration {
         this.processList = processList;
     }
 
-    public String[] getBurstList() {
-        return burstList;
-    }
-
-    public void setBurstList(String[] burstList) {
-        this.burstList = burstList;
-    }
-
-    public ThreadLibrary getThreadLibrary() {
+    public String getThreadLibrary() {
         return threadLibrary;
     }
 
-    public void setThreadLibrary(ThreadLibrary threadLibrary) {
+    public void setThreadLibrary(String threadLibrary) {
         this.threadLibrary = threadLibrary;
     }
 
-    public ProcessPlanification getProcessPlanification() {
+    public String getProcessPlanification() {
         return processPlanification;
     }
 
-    public void setProcessPlanification(ProcessPlanification processPlanification) {
+    public void setProcessPlanification(String processPlanification) {
         this.processPlanification = processPlanification;
     }
 
+    public Integer getIOCount() {
+        return IOCount;
+    }
+
+    public void setIOCount(Integer IOCount) {
+        this.IOCount = IOCount;
+    }
 }

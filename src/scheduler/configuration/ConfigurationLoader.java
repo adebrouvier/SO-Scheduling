@@ -1,21 +1,25 @@
 package scheduler.configuration;
 
 import org.apache.commons.cli.*;
-import scheduler.*;
+import scheduler.Burst;
+import scheduler.KernelLevelThread;
 import scheduler.Process;
-import scheduler.Thread;
+import scheduler.UserLevelThread;
 
 import java.io.File;
-import java.util.Scanner;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ConfigurationLoader {
 
     private String fileName = "./res/settings.so";
     private Integer processes = 1;
     private Integer bursts = 1;
-    private ProcessPlanification processPlanification = ProcessPlanification.FIFO;
-    private ThreadLibrary threadLibrary = ThreadLibrary.FIFO;
+    private String processPlanification = "FIFO";
+    private String threadLibrary = "FIFO";
     private Integer cores=1;
+    private Integer IOCount=1;
 
     public ConfigurationLoader(String [] args){
 
@@ -23,8 +27,9 @@ public class ConfigurationLoader {
         Options options = new Options();
 
         // add option
-        String[] optionList = {"p","b","c","pp","tl"};
-        String[] optionDescriptions = {"number of processes","number of bursts","number of cores","process planification","thread library"};
+        String[] optionList = {"p","b","c","ps","tl", "io"};
+        String[] optionDescriptions = {"number of processes","number of bursts",
+                "number of cores","process scheduling","thread library","number of io devices"};
 
         for (int i = 0;i < optionList.length;i++) {
             Option option = new Option(optionList[i], true, optionDescriptions[i]);
@@ -60,14 +65,19 @@ public class ConfigurationLoader {
                 cores=Integer.parseInt(pOption);
             }
 
-            if (cmd.hasOption("pp")){
-                pOption = cmd.getOptionValue("pp");
-                processPlanification=ProcessPlanification.valueOf(pOption.toUpperCase());
+            if (cmd.hasOption("ps")){
+                pOption = cmd.getOptionValue("ps");
+                processPlanification=pOption.toUpperCase();
             }
 
             if (cmd.hasOption("tl")){
                 pOption = cmd.getOptionValue("tl");
-                threadLibrary=ThreadLibrary.valueOf(pOption.toUpperCase());
+                threadLibrary=pOption.toUpperCase();
+            }
+
+            if (cmd.hasOption("io")){
+                pOption = cmd.getOptionValue("io");
+                IOCount=Integer.parseInt(pOption);
             }
 
         } catch (ParseException exp) {
@@ -79,12 +89,11 @@ public class ConfigurationLoader {
     public Configuration load (){
 
         File file = new File(fileName);
-        Configuration config = new Configuration(null,null, cores, threadLibrary, processPlanification);
+
+        Process[] processList = new Process[processes];
 
         try {
             Scanner sc = new Scanner(file);
-
-            Process[] processList = new Process[processes];
 
             //Create process list
             for (int i = 0; i < processes; i++){
@@ -98,51 +107,83 @@ public class ConfigurationLoader {
                 numberOfThreads[i] = sc.nextInt();
             }
 
-            String[] burstType = new String[bursts];
+            Burst[] burst = new Burst[bursts];
 
             // Obtain burst type for each burst
             for (int i = 0; i < bursts ; i++){
-                burstType[i] = sc.next();
+                burst[i] = new Burst(0,sc.next());
             }
-
-            config.setBurstList(burstType);
 
             for (int i = 0; i<processes ; i++){
 
-                Thread[] threadList = new Thread[numberOfThreads[i]];
+                Map<Integer,KernelLevelThread> threadList = new HashMap<>();
 
                 for (int j = 0; j<numberOfThreads[i] ; j++){
 
-                    String threadTypeInput = String.valueOf(sc.next().charAt(0));
-
-                    ThreadType type = null;
-
-                    if (threadTypeInput.equals(ThreadType.KLT.threadType))
-                        type = ThreadType.KLT;
-
-                    if (threadTypeInput.equals(ThreadType.ULT.threadType))
-                        type = ThreadType.ULT;
-
-                    Integer[] burst = new Integer[bursts];
+                    String threadTypeInput = sc.next();
 
                     for (int k = 0; k < bursts ; k++){
-                        burst[k] = sc.nextInt();
+                        burst[k].setTime(sc.nextInt());
                     }
 
-                    Thread t = new Thread(type,burst);
-                    threadList[j] = t;
+                    Pattern p1 = Pattern.compile("P[0-9]+_K[0-9]+_U[0-9]+");
+                    Pattern p2 = Pattern.compile("P[0-9]+_K[0-9]+");
+
+                    Matcher m1 = p1.matcher(threadTypeInput);
+                    Matcher m2 = p2.matcher(threadTypeInput);
+
+                    String[] tokens = threadTypeInput.split("_");
+
+                    int kernelThreadNumber = Integer.valueOf(tokens[1].substring(1))-1;
+
+                    if (m1.matches()){
+
+                        KernelLevelThread klt = threadList.get(kernelThreadNumber);
+
+                        if (klt == null)
+                            klt = new KernelLevelThread(burst);
+
+                        UserLevelThread ult = new UserLevelThread(burst);
+
+                        klt.addUserLevelThread(ult);
+
+                        threadList.put(kernelThreadNumber,klt);
+
+                    }else if (m2.matches()){
+
+                        KernelLevelThread klt = new KernelLevelThread(burst);
+                        threadList.put(kernelThreadNumber,klt);
+
+                    }else{
+                        System.err.println("Wrong parameters");
+                        System.exit(0);
+                    }
+
                 }
 
-                processList[i].setThreads(threadList);
+                processList[i].setThreads(arrayifi(threadList));
             }
-
-            config.setProcessList(processList);
 
         }catch (Exception e){
             e.printStackTrace();
         }
 
+        Configuration config = new Configuration(processList, cores, threadLibrary, processPlanification,IOCount);
+
         return config;
+    }
+
+    private KernelLevelThread[] arrayifi(Map<Integer,KernelLevelThread> threadList) {
+
+        int size = threadList.size();
+
+        KernelLevelThread[] resul = new KernelLevelThread[size];
+
+        for (int i = 0; i <size ; i++){
+            resul[i] = threadList.get(i);
+        }
+
+        return resul;
     }
 
 
