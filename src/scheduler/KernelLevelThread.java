@@ -4,6 +4,10 @@ public class KernelLevelThread extends Thread {
 
     private UserLevelThread[] threads;
 
+    public KernelLevelThread(Burst[] processingTime) {
+        super(processingTime);
+    }
+
     public UserLevelThread[] getThreads() {
         return threads;
     }

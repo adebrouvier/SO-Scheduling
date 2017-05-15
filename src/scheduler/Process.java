@@ -28,8 +28,9 @@ public class Process {
     public boolean decreaseTime() {
         remainingTime--;
         if (threads[currentThreadIndex].decreaseTime()) {
-            threads[currentThreadIndex] = null;
-
+            //if (threads[currentThreadIndex].isFinished())
+            //  threads[currentThreadIndex] = null;
+            return true;
         }
 
         return false;

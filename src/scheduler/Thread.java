@@ -29,14 +29,11 @@ public class Thread {
         if (currentBurstFinished) {
             currentBurst = currentBurst++;
             if (currentBurst == bursts.length) {
-
+                // TODO que pasa cuando se ejecutó to do el thread
             }
-            return true;
-//            if (currentBurst == bursts.length) // se ejecutó to do el thread
-//                return true;
         }
 
-        return false;
+        return currentBurstFinished;
     }
 
     public Burst[] getBursts() {

@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Clase principal
- * TODO ordenar los procesos por arrival time
+ * TODO validar que los procesos tengan arrival time positivo, etc (Cuando se crea el proceso)
  * TODO checkear en el parseo que los bursts esten intercalados y que termine siempre con burst de cpu
  */
 public abstract class Scheduler {
