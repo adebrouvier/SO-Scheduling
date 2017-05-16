@@ -1,9 +1,8 @@
-package scheduler.configuration;
+package main.controller.configuration;
 
 import org.apache.commons.cli.*;
-import scheduler.*;
-import scheduler.Process;
-import scheduler.Thread;
+import main.model.process.Process;
+import main.model.thread.Thread;
 
 import java.io.File;
 import java.util.Scanner;
@@ -24,7 +23,7 @@ public class ConfigurationLoader {
 
         // add option
         String[] optionList = {"p","b","c","pp","tl"};
-        String[] optionDescriptions = {"number of processes","number of bursts","number of cores","process planification","thread library"};
+        String[] optionDescriptions = {"number of processes","number of bursts","number of cores","process process","thread library"};
 
         for (int i = 0;i < optionList.length;i++) {
             Option option = new Option(optionList[i], true, optionDescriptions[i]);
@@ -38,7 +37,7 @@ public class ConfigurationLoader {
         HelpFormatter formatter = new HelpFormatter();
 
         //TODO: remove this line
-        formatter.printHelp("scheduler",options);
+        formatter.printHelp("main",options);
 
         try {
             cmd = parser.parse( options, args);

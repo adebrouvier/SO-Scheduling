@@ -1,4 +1,6 @@
-package scheduler;
+package main.model;
+
+import main.model.process.Process;
 
 import java.util.LinkedList;
 import java.util.Queue;

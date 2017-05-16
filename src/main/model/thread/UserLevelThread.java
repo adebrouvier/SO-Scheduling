@@ -1,4 +1,6 @@
-package scheduler;
+package main.model.thread;
+
+import main.model.Burst;
 
 /**
  * Created by Tobias on 13/5/2017.
