@@ -23,7 +23,8 @@ public class Process {
 
     protected Integer pid;
 
-    public Process(KernelLevelThread[] threads) {
+    public Process(Integer pid, KernelLevelThread[] threads) {
+        this.pid = pid;
         this.threads = threads;
 
         for (int i = 0; i < threads.length; i++) {

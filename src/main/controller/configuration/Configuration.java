@@ -8,7 +8,6 @@ import java.util.Map;
 public class Configuration {
 
     private Process[] processList;
-    private String[] burstList;
     private Integer cores;
     private String threadLibrary;
     private String processScheduling;
@@ -17,7 +16,7 @@ public class Configuration {
     private int quantum;
     private Integer IOCount;
 
-    public Configuration(Process[] processList, String[] burstList, Integer cores, String threadLibrary, String processScheduling, int ioCount) {
+    public Configuration(Process[] processList, Integer cores, String threadLibrary, String processScheduling, int ioCount) {
         this.processList = processList;
         this.cores = cores;
         this.threadLibrary = threadLibrary;
@@ -39,14 +38,6 @@ public class Configuration {
 
     public void setProcessList(Process[] processList) {
         this.processList = processList;
-    }
-
-    public String[] getBurstList() {
-        return burstList;
-    }
-
-    public void setBurstList(String[] burstList) {
-        this.burstList = burstList;
     }
 
     public String getThreadLibrary() {

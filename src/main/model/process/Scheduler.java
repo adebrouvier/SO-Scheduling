@@ -31,7 +31,7 @@ public abstract class Scheduler extends Process {
     protected List<IO> IODevices;
 
     public Scheduler(Integer coreAmount, String threadLib, Integer ioCount) {
-        super(null);
+        super(0, null);
         this.coreAmount = coreAmount;
         this.threadLib = threadLib;
 

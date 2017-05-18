@@ -32,4 +32,8 @@ public class Burst {
     public String getType() {
         return type;
     }
+
+    public void setTime(int time) {
+        this.remainingTime = time;
+    }
 }
