@@ -12,15 +12,17 @@ public class Configuration {
     private Integer cores;
     private String threadLibrary;
     private String processScheduling;
+    // TODO ioCount y quantum
     private int ioCount;
     private int quantum;
+    private Integer IOCount;
 
-    public Configuration(Process[] processList, String[] burstList, Integer cores, String threadLibrary, String processScheduling) {
+    public Configuration(Process[] processList, String[] burstList, Integer cores, String threadLibrary, String processScheduling, int ioCount) {
         this.processList = processList;
-        this.burstList = burstList;
         this.cores = cores;
         this.threadLibrary = threadLibrary;
         this.processScheduling = processScheduling;
+        this.IOCount = ioCount;
     }
 
     public Integer getCores() {
@@ -55,8 +57,8 @@ public class Configuration {
         return processScheduling;
     }
 
-    public int getIOCount() {
-        return ioCount;
+    public Integer getIOCount() {
+        return IOCount;
     }
 
     public int getQuantum() {
@@ -67,4 +69,9 @@ public class Configuration {
     public Map<Integer,List<Process>> getProcesses() {
         return null;
     }
+
+    public void setThreadLibrary(String threadLibrary) {
+            this.threadLibrary = threadLibrary;
+    }
+
 }

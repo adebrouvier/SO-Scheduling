@@ -2,9 +2,11 @@ package main.model.thread;
 
 import main.model.Burst;
 
+import java.util.ArrayList;
+
 public class KernelLevelThread extends Thread {
 
-    private UserLevelThread[] threads;
+    private ArrayList<UserLevelThread> threads;
 
     public KernelLevelThread(Burst[] processingTime) {
         super(processingTime);
@@ -17,16 +19,18 @@ public class KernelLevelThread extends Thread {
         return false;
     }
 
-    public UserLevelThread[] getThreads() {
+    public ArrayList<UserLevelThread> getThreads() {
         return threads;
-    }
-
-    public void setThreads(UserLevelThread[] threads) {
-        this.threads = threads;
     }
 
     public int getDuration() {
         return remainingTime;
     }
 
+    public void addUserLevelThread(UserLevelThread u) {
+        if (threads == null){
+            threads = new ArrayList<>();
+        }
+        this.threads.add(u);
+    }
 }
