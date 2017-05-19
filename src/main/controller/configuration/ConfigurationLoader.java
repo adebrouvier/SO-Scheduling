@@ -1,11 +1,11 @@
 package main.controller.configuration;
 
-import org.apache.commons.cli.*;
-import main.model.process.Process;
-import main.model.thread.Thread;
 import main.model.Burst;
-import main.model.thread.*;
 import main.model.process.Process;
+import main.model.thread.KernelLevelThread;
+import main.model.thread.UserLevelThread;
+import org.apache.commons.cli.*;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.io.File;
 import java.util.*;
@@ -21,6 +21,8 @@ public class ConfigurationLoader {
     private String threadLibrary = "FIFO";
     private Integer cores=1;
     private Integer IOCount=1;
+    private Integer schedulingQuantum=1;
+    private Integer threadQuantum=2;
 
     public ConfigurationLoader(String [] args){
 
@@ -28,14 +30,17 @@ public class ConfigurationLoader {
         Options options = new Options();
 
         // add option
-        String[] optionList = {"p","b","c","ps","tl", "io"};
+        String[] optionList = {"p","b","c","ps","tl","io"};
+        String[] quantumOptionList = {"sq","tq"};
+        //String[] longOption = {"processes","bursts","cores","scheduling","threadlibrary","iodevices"};
         String[] optionDescriptions = {"number of processes","number of bursts",
-                "number of cores","process scheduling","thread library","number of io devices"};
+                "number of cores","type of process scheduling","thread library algorithm","number of io devices"};
 
         for (int i = 0;i < optionList.length;i++) {
             Option option = new Option(optionList[i], true, optionDescriptions[i]);
             option.setArgs(1);
             option.setRequired(true);
+            //option.setLongOpt(longOption[i]);
             options.addOption(option);
         }
 
@@ -43,7 +48,7 @@ public class ConfigurationLoader {
         CommandLine cmd;
         HelpFormatter formatter = new HelpFormatter();
 
-        //TODO: remove this line
+        //TODO: comando para help
         formatter.printHelp("main",options);
 
         try {
@@ -69,11 +74,39 @@ public class ConfigurationLoader {
             if (cmd.hasOption("ps")){
                 pOption = cmd.getOptionValue("ps");
                 processPlanification=pOption.toUpperCase();
+
+                Pattern p = Pattern.compile("RR_[0-9]+");
+                Matcher m = p.matcher(processPlanification);
+
+                if (m.matches()){
+                    schedulingQuantum=Integer.valueOf(processPlanification.split("_")[1]);
+
+                    if (schedulingQuantum < 0){
+                        System.err.println("Scheduling RR quantum has to be positive.");
+                    }
+
+                    processPlanification="RR";
+                }
+
             }
 
             if (cmd.hasOption("tl")){
                 pOption = cmd.getOptionValue("tl");
                 threadLibrary=pOption.toUpperCase();
+
+                Pattern p = Pattern.compile("RR_[0-9]+");
+                Matcher m = p.matcher(threadLibrary);
+
+                if (m.matches()){
+                    threadQuantum=Integer.valueOf(threadLibrary.split("_")[1]);
+
+                    if (threadQuantum <= 0 || threadQuantum.equals(schedulingQuantum)) {
+                        System.err.println("Thread RR quantum has to be positive and different from Scheduling Quantum.");
+                        System.exit(0);
+                    }
+
+                    threadLibrary="RR";
+                }
             }
 
             if (cmd.hasOption("io")){
@@ -91,17 +124,21 @@ public class ConfigurationLoader {
 
         File file = new File(fileName);
 
-        Process[] processList = new Process[processes];
+        List<Process> processList = new ArrayList<>();
+
+        Map<Integer,List<Process>> processArrivals = new HashMap<>();
 
         try {
             Scanner sc = new Scanner(file);
 
-            //Create process list
-            for (int i = 0; i < processes; i++){
-                processList[i] = new Process(sc.nextInt(), null);
-            }
-
             int[] numberOfThreads = new int[processes];
+
+            int[] arrivalTimes = new int[processes];
+
+            // Obtener tiempos de llegada
+            for (int i = 0; i < processes; i++){
+                arrivalTimes[i] = sc.nextInt();
+            }
 
             // Obtain number of threads for each process
             for (int i = 0; i < processes; i++){
@@ -162,16 +199,27 @@ public class ConfigurationLoader {
 
                 }
 
-                processList[i].setThreads(arrayifi(threadList));
+                processList.add(new Process(i,arrayifi(threadList)));
+            }
+
+            for(int i = 0 ; i < processes ; i++){
+
+                List<Process> instant = processArrivals.get(arrivalTimes[i]);
+
+                if (instant == null){
+                    instant =  new ArrayList<>();
+                }
+
+                instant.add(processList.get(i));
+
+                processArrivals.put(arrivalTimes[i],instant);
             }
 
         }catch (Exception e){
             e.printStackTrace();
         }
 
-        Configuration config = new Configuration(processList, cores, threadLibrary, processPlanification,IOCount);
-
-        return config;
+        return new Configuration(processArrivals, cores, threadLibrary, processPlanification,IOCount,0,0);
     }
 
     private KernelLevelThread[] arrayifi(Map<Integer,KernelLevelThread> threadList) {

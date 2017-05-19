@@ -7,21 +7,23 @@ import java.util.Map;
 
 public class Configuration {
 
-    private Process[] processList;
+    private Map<Integer,List<Process>> processList;
     private Integer cores;
     private String threadLibrary;
     private String processScheduling;
-    // TODO ioCount y quantum
-    private int ioCount;
-    private int quantum;
+    private Integer schedulingQuantum;
+    private Integer threadQuantum;
     private Integer IOCount;
 
-    public Configuration(Process[] processList, Integer cores, String threadLibrary, String processScheduling, int ioCount) {
+    public Configuration(Map<Integer,List<Process>> processList, Integer cores,
+                         String threadLibrary, String processScheduling, int ioCount, int schedulingQuantum, int threadQuantum) {
         this.processList = processList;
         this.cores = cores;
         this.threadLibrary = threadLibrary;
         this.processScheduling = processScheduling;
         this.IOCount = ioCount;
+        this.schedulingQuantum = schedulingQuantum;
+        this.threadQuantum = threadQuantum;
     }
 
     public Integer getCores() {
@@ -30,14 +32,6 @@ public class Configuration {
 
     public void setCores(Integer cores) {
         this.cores = cores;
-    }
-
-    public Process[] getProcessList() {
-        return processList;
-    }
-
-    public void setProcessList(Process[] processList) {
-        this.processList = processList;
     }
 
     public String getThreadLibrary() {
@@ -52,17 +46,20 @@ public class Configuration {
         return IOCount;
     }
 
-    public int getQuantum() {
-        return quantum;
+    public int getSchedulingQuantum() {
+        return schedulingQuantum;
     }
 
-    // TODO crear mapa en vez de lista
     public Map<Integer,List<Process>> getProcesses() {
-        return null;
+        return processList;
     }
 
     public void setThreadLibrary(String threadLibrary) {
             this.threadLibrary = threadLibrary;
+    }
+
+    public Integer getThreadQuantum() {
+        return threadQuantum;
     }
 
 }

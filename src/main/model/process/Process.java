@@ -19,7 +19,7 @@ public class Process {
     private Queue<Thread> readyQueue;
     private Queue<Thread> blockedQueue;
 
-    private Integer remainingTime;
+    private Integer remainingTime = 0;
 
     protected Integer pid;
 

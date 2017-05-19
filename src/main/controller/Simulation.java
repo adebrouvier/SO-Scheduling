@@ -31,7 +31,7 @@ public class Simulation {
         if (scheduling.equals("FIFO")) {
             scheduler = new SchedulerFIFO(cores, threadLibrary, ioCount);
         } else if (scheduling.equals("RR")) {
-            int quantum = cfg.getQuantum();
+            int quantum = cfg.getSchedulingQuantum();
             scheduler = new SchedulerRoundRobin(cores, threadLibrary, ioCount, quantum);
         }
 

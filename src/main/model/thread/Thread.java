@@ -8,7 +8,7 @@ public abstract class Thread {
     protected Burst[] bursts;
     protected Integer currentBurst;
 
-    protected Integer remainingTime;
+    protected Integer remainingTime = 0;
 
     protected Integer affinity;
 
