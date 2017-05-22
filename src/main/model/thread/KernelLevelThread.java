@@ -3,34 +3,28 @@ package main.model.thread;
 import main.model.Burst;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class KernelLevelThread extends Thread {
+public class KernelLevelThread extends Thread{
 
-    private ArrayList<UserLevelThread> threads;
+    private List<UserLevelThread> ults;
+    private UserLevelThread blockedUlt;
+    private int parent;
+    private ThreadLibraryType threadLibraryType;
 
-    public KernelLevelThread(Burst[] processingTime) {
-        super(processingTime);
+    public KernelLevelThread( List<Burst> burstList, int parent, ThreadLibraryType threadLibraryType) {
+        super(burstList);
+        this.parent = parent;
+        this.threadLibraryType = threadLibraryType;
     }
 
-    //TODO
+    public int getParentID(){
+        return parent;
+    }
+
     public boolean execute() {
         // si tiene ults, usar la biblioteca
         // sino, usar super.execute();
-        return false;
-    }
-
-    public ArrayList<UserLevelThread> getThreads() {
-        return threads;
-    }
-
-    public int getDuration() {
-        return remainingTime;
-    }
-
-    public void addUserLevelThread(UserLevelThread u) {
-        if (threads == null){
-            threads = new ArrayList<>();
-        }
-        this.threads.add(u);
+        return super.execute();
     }
 }

@@ -3,47 +3,34 @@ package main.model.process;
 import main.model.Core;
 import main.model.IO;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Clase principal
  * TODO validar que los procesos tengan arrival time positivo, etc (Cuando se crea el proceso)
  * TODO checkear en el parseo que los bursts esten intercalados y que termine siempre con burst de cpu
  */
-public abstract class Scheduler extends Process {
+public abstract class Scheduler {
 
-    //Procesadores y IO
-    protected Integer coreAmount;
-    protected Integer IOCount;
-
-    //Librería a utilizarse en los hilos ULT
-    protected String threadLib;
-
+    protected Map<Integer,Process> processes;
     protected Queue<Process> readyQueue;
     protected Queue<Process> blockedQueue;
-
-    protected Core[] cores;
-
-    // Dispositivos IO
+    protected List<Core> cores;
     protected List<IO> IODevices;
 
-    public Scheduler(Integer coreAmount, String threadLib, Integer ioCount) {
-        super(0, null);
-        this.coreAmount = coreAmount;
-        this.threadLib = threadLib;
-
-        createCores();
+    public Scheduler (int coreCount, int ioCount){
+        processes = new HashMap<>();
+        readyQueue = new LinkedList<>();
+        blockedQueue = new LinkedList<>();
+        createCores(coreCount);
         createIODevices(ioCount);
     }
 
-    private void createCores(){
-        this.cores = new Core[coreAmount];
+    private void createCores(int coreCount){
+        this.cores = new ArrayList<>();
 
-        for (int i = 0 ; i < coreAmount ; i++){
-            this.cores[i]= new Core(i);
+        for (int i = 0 ; i < coreCount ; i++){
+            cores.add(new Core(i));
         }
     }
 
@@ -56,7 +43,7 @@ public abstract class Scheduler extends Process {
     }
 
     /**
-     * @see Process#execute()
+     *
      * @param processes new processes created in this instant of time
      */
     public boolean execute(Collection<Process> processes) {
@@ -70,28 +57,30 @@ public abstract class Scheduler extends Process {
     }
 
     public void runIO() {
+
         for (IO io : IODevices) {
-            if (!io.isBusy()) {
-                io.setCurrentProcess();
+
+            Process ready = processes.get(io.getReady().getParentID());
+
+            if (ready != null) {
+                readyQueue.add(ready);
             }
 
-            if (io.isBusy()) {
-                if (io.getCurrentProcess().execute()) { // los procesos siempre terminan con burst de cpu entonces no es necesario checkear
-                    readyQueue.add(io.getCurrentProcess());
-                    io.poll();
-                }
-            }
+            io.execute();
         }
     }
 
     public abstract void executeAlgorithm();
 
     public void addProcesses(Collection<Process> processes) {
+
         for (Process process : processes) {
             process.setState(ProcessState.READY);
+            this.processes.put(process.getPid(),process);
         }
 
         readyQueue.addAll(processes);
+
     }
 
 }

@@ -2,11 +2,16 @@ package main.model.thread;
 
 import main.model.Burst;
 
+import java.util.List;
+
 /**
- * Created by Tobias on 13/5/2017.
  */
-public class UserLevelThread extends Thread {
-    public UserLevelThread(Burst[] processingTime) {
-        super(processingTime);
+public class UserLevelThread extends Thread{
+
+    private int parent;
+
+    public UserLevelThread(List<Burst> burstList, int parent) {
+        super(burstList);
+        this.parent = parent;
     }
 }

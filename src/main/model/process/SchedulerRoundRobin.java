@@ -4,10 +4,10 @@ package main.model.process;
  */
 public class SchedulerRoundRobin extends Scheduler {
 
-    private Integer quantum;
+    private int quantum;
 
-    public SchedulerRoundRobin(Integer coreAmount, String threadLib, Integer ioCount, int quantum) {
-        super(coreAmount, threadLib, ioCount);
+    public SchedulerRoundRobin(int coreAmount, int ioCount, int quantum) {
+        super(coreAmount, ioCount);
         this.quantum = quantum;
     }
 

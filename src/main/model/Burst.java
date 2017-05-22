@@ -5,35 +5,29 @@ package main.model;
  */
 public class Burst {
 
-    private Integer remainingTime;
-    private final String type;
+    private int type;
+    private int time;
+    private int remainingTime;
 
-    public Burst(Integer remainingTime, String type) {
-        this.remainingTime = remainingTime;
+    public Burst(int type, int time){
         this.type = type;
+        this.time = time;
+        this.remainingTime = time;
     }
 
-    /**
-     * Executes a unit of time
-     * @return true if burst is finished
-     */
+    public int getType (){
+        return this.type;
+    }
+
+    public int getTime (){
+        return time;
+    }
+
     public boolean execute() {
-        if (remainingTime > 0) {
+
+        if (remainingTime>0)
             remainingTime--;
-        }
 
         return remainingTime == 0;
-    }
-
-    public Integer getRemainingTime() {
-        return remainingTime;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setTime(int time) {
-        this.remainingTime = time;
     }
 }

@@ -2,48 +2,56 @@ package main.model.thread;
 
 import main.model.Burst;
 
-public abstract class Thread {
+import java.util.List;
 
-    protected ThreadState state;
-    protected Burst[] bursts;
-    protected Integer currentBurst;
+public class Thread {
 
-    protected Integer remainingTime = 0;
+    private List<Burst> bursts;
+    private ThreadState state;
+    private int currentBurstIndex;
+    private Burst currentBurst;
 
-    protected Integer affinity;
+    public Thread (List<Burst> burstList){
+        this.bursts=burstList;
+    }
 
-    public Thread(Burst[] processingTime) {
-        this.bursts = processingTime;
-        for(Burst b : processingTime) {
-            this.remainingTime += b.getRemainingTime();
-        }
-        currentBurst = 0;
+    public void setThreadState(ThreadState state){
+        this.state=state;
     }
 
     /**
      *
-     * @return true if current burst is finished
+     * @return true si terminó la burst actual
      */
     public boolean execute() {
-        boolean currentBurstFinished = bursts[currentBurst].execute();
 
-        remainingTime--;
+        boolean burstFinished = bursts.get(currentBurstIndex).execute();
 
-        if (currentBurstFinished) {
-            currentBurst = currentBurst++;
-            if (currentBurst == bursts.length) {
+        if (burstFinished){
+            int burstType = bursts.get(currentBurstIndex).getType();
+            if(burstType == 0) {
+                state = ThreadState.BLOCKED;
+            } else {
+                state = ThreadState.READY;
+            }
+
+            currentBurstIndex++;
+            if (currentBurstIndex == bursts.size()){
                 state = ThreadState.FINISHED;
             }
         }
 
-        return currentBurstFinished;
-    }
-
-    public Integer getAffinity() {
-        return affinity;
+        return burstFinished;
     }
 
     public ThreadState getState() {
         return state;
+    }
+
+    public Burst getCurrentBurst() {
+//        if (state == ThreadState.FINISHED) {
+//            return null;
+//        }
+        return bursts.get(currentBurstIndex);
     }
 }

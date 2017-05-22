@@ -26,13 +26,12 @@ public class Simulation {
         int ioCount = cfg.getIOCount();
 
         String scheduling = cfg.getScheduling();
-        String threadLibrary = cfg.getThreadLibrary();
 
         if (scheduling.equals("FIFO")) {
-            scheduler = new SchedulerFIFO(cores, threadLibrary, ioCount);
+            scheduler = new SchedulerFIFO(cores, ioCount);
         } else if (scheduling.equals("RR")) {
             int quantum = cfg.getSchedulingQuantum();
-            scheduler = new SchedulerRoundRobin(cores, threadLibrary, ioCount, quantum);
+            scheduler = new SchedulerRoundRobin(cores, ioCount, quantum);
         }
 
         processes = cfg.getProcesses();
@@ -63,11 +62,4 @@ public class Simulation {
             }
         }
     }
-
-
-
-    private Process createProcess(int pid, List<KernelLevelThread> klts) {
-        return null;
-    }
-
 }

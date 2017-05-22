@@ -1,6 +1,6 @@
 package main.model;
 
-import main.model.process.Process;
+import main.model.thread.KernelLevelThread;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -9,38 +9,49 @@ import java.util.Queue;
  */
 public class IO {
 
-    private Queue<Process> processQueue;
-    private Integer ID;
+    private int id;
+    private Queue<KernelLevelThread> blockedKlts;
+    private KernelLevelThread currentKlt;
+    private KernelLevelThread readyKlt; //TODO agregar próximo instante
 
-    private Process currentProcess;
-
-    public IO(Integer ID) {
-        this.ID = ID;
-        processQueue = new LinkedList<>();
+    public IO (int id){
+        this.id=id;
+        blockedKlts = new LinkedList<>();
     }
 
-    public Process poll() {
-        return processQueue.poll();
+    public boolean isBusy(){
+        return currentKlt != null;
     }
 
-    public void add(Process process) {
-        processQueue.add(process);
+    private void setCurrent() {
+        currentKlt = blockedKlts.poll();
     }
 
-    public Integer getID() {
-        return ID;
+    public void execute() {
+
+        if (!isBusy()) {
+            setCurrent();
+        }
+
+        if (isBusy()) {
+            if (currentKlt.execute()) { // los procesos siempre terminan con burst de cpu entonces no es necesario checkear
+                //TODO aca hay que actualizar las listas de ready en process
+                readyKlt = currentKlt;
+                currentKlt = null;
+            }
+        }
+
     }
 
-    public Process getCurrentProcess() {
-        return currentProcess;
+    /**
+     *
+     * @return el KLT si se desbloqueó
+     */
+    public KernelLevelThread getReady() {
+        return readyKlt;
     }
 
-    public void setCurrentProcess() {
-        currentProcess = poll();
+    public void add(KernelLevelThread klt) {
+        blockedKlts.add(klt);
     }
-
-    public boolean isBusy() {
-        return currentProcess != null;
-    }
-
 }

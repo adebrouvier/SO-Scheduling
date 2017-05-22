@@ -1,38 +1,69 @@
 package main.model.process;
 
 import main.model.Core;
+import main.model.IO;
+import main.model.thread.KernelLevelThread;
+import main.model.thread.ThreadState;
 
 /**
  */
-public class SchedulerFIFO extends Scheduler {
+public class SchedulerFIFO extends Scheduler{
 
-    public SchedulerFIFO(Integer coreAmount, String threadLib, Integer ioCount) {
-        super(coreAmount, threadLib, ioCount);
+    public SchedulerFIFO (int coreCount, int ioCount){
+        super(coreCount,ioCount);
     }
 
-    //TODO affinity??
-    public void executeAlgorithm(){
+    @Override
+    public void executeAlgorithm() {
 
-        for (Core core: cores) {
-            if (core.getCurrentProcess() == null) {              // si el core esta idle
-                core.setCurrentProcess(readyQueue.poll());
+        for (Core core : cores) {
+
+            if (!core.isRunning()) {
+
+                Process p = readyQueue.peek(); // puede haber mas de un klt del mismo proceso en distintos cores
+
+                if (p == null) {
+                    //TODO Corre el SO
+                    continue;
+                }
+
+
+
+                KernelLevelThread klt = p.getCurrentKLT(); //TODO este metodo hace la merca (elige el klt segun nuestra logica merca dentro del proceso merca dentro del proceso merca)
+                core.setCurrentKLT(klt);
             }
 
-            Process currentProcess = core.getCurrentProcess();
+            KernelLevelThread klt = core.getCurrentKLT();
+            Process process = processes.get(klt.getParentID());
+            if (klt.execute()) { // se bloqueo o termino el thread
+                ThreadState state = klt.getState();
 
-            if (currentProcess != null) {
-                if (currentProcess.execute()) {      // se bloqueó o terminó
-                    if (currentProcess.getState() == ProcessState.FINISHED) {
-                        //TODO FIN?
+                if (state == ThreadState.BLOCKED) {
+                    //TODO actualizar las listas de bloqueados en process
+                    IO io = IODevices.get(klt.getCurrentBurst().getType());
+                    io.add(klt);
+
+                    // if (todos los klt del proceso estan bloqueados)
+                    if (process.isBlocked()) { // TODO update lists
+                        //process.setState(ProcessState.BLOCKED);
+                        blockedQueue.add(process);
                     }
-                    if (currentProcess.getState() == ProcessState.BLOCKED) {
-                        blockedQueue.add(currentProcess);
+                } else if (state == ThreadState.FINISHED) {
+                    // if (todos los klt del proceso estan finished)
+                    if (process.isFinished()) {
+                        //process.setState(ProcessState.FINISHED);
                     }
-                    core.free(); //libero el core
                 }
             }
+
+            //el thread sigue corriendo
+
+            if (process.hasAvailableKLT()) {
+                readyQueue.poll();
+            }
+
         }
 
-    }
 
+    }
 }

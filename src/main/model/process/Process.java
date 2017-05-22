@@ -8,111 +8,75 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
 public class Process {
 
+    private static int processCount;
+
     private ProcessState state;
-    private KernelLevelThread[] threads;
+    private List<KernelLevelThread> klt;
+    private Queue<KernelLevelThread> blockedThreads;
+    private Queue<KernelLevelThread> readyThreads;
 
-    private Integer currentThreadIndex = -1;
+    private List<KernelLevelThread> finishedThreads;
 
-    // TODO KEH
-    private Queue<Thread> readyQueue;
-    private Queue<Thread> blockedQueue;
+    private int pid;
 
-    private Integer remainingTime = 0;
+    public Process (){
+        this.pid = processCount++;
+        this.state = ProcessState.NEW;
 
-    protected Integer pid;
-
-    public Process(Integer pid, KernelLevelThread[] threads) {
-        this.pid = pid;
-        this.threads = threads;
-
-        for (int i = 0; i < threads.length; i++) {
-            remainingTime += threads[i].getDuration();
-        }
-
-        state = ProcessState.NEW;
-    }
-
-    /**
-     *  Runs the process 1 unit of time
-     * @return true if burst of current thread is finished
-     */
-    public boolean execute() {
-        if (remainingTime > 0) {
-            remainingTime--;
-        }
-
-        if (currentThreadIndex == -1) { //primera vez que se ejecuta el proceso
-            state = ProcessState.EXECUTING;
-            currentThreadIndex = 0;
-        }
-
-        if (state == ProcessState.EXECUTING) {
-            Thread currentThread = threads[currentThreadIndex];
-            if (currentThread.execute()) {        // termino la burst del thread actual
-                if (currentThread.getState() == ThreadState.FINISHED) {
-                    threads[currentThreadIndex] = null;
-                    currentThreadIndex++;
-                    if (currentThreadIndex == threads.length) { // se corrieron todos los threads, en orden. Esto es asi???
-                        state = ProcessState.FINISHED;
-                    }
-                }
-                if (currentThread.getState() == ThreadState.BLOCKED) {
-                    state = ProcessState.BLOCKED; // TODO CHECKEAR CON NESTOR
-
-                }
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public List<KernelLevelThread> getThreads() {
-
-        List<KernelLevelThread> list = new ArrayList<>();
-        for (KernelLevelThread klt: threads) {
-            list.add(klt);
-        }
-
-        return list;
-    }
-
-    public void setThreads(KernelLevelThread[] threads) {
-        this.threads = threads;
-    }
-
-    public Queue<Thread> getReadyQueue() {
-        return readyQueue;
-    }
-
-    public void setReadyQueue(Queue<Thread> readyQueue) {
-        this.readyQueue = readyQueue;
-    }
-
-    public Queue<Thread> getBlockedQueue() {
-        return blockedQueue;
-    }
-
-    public void setBlockedQueue(Queue<Thread> blockedQueue) {
-        this.blockedQueue = blockedQueue;
-    }
-
-    public Integer getRemainingTime() {
-        return remainingTime;
-    }
-
-    public void setRemainingTime(Integer remainingTime) {
-        this.remainingTime = remainingTime;
-    }
-
-    public void setState(ProcessState state) {
-        this.state = state;
+        klt = new ArrayList<>();
+        blockedThreads = new LinkedList<>();
+        readyThreads = new LinkedList<>();
+        finishedThreads = new ArrayList<>();
     }
 
     public ProcessState getState() {
         return state;
     }
 
+    public int getPid() {
+        return pid;
+    }
+
+    public void setState(ProcessState state) {
+        this.state = state;
+    }
+
+    public boolean isBlocked() {
+        boolean blocked = blockedThreads.size() == klt.size();
+        if (blocked) {
+            setState(ProcessState.BLOCKED);
+        }
+        return blocked;
+    }
+
+    public boolean isFinished() {
+        boolean finished = klt.size() == finishedThreads.size();
+        if (finished) {
+            setState(ProcessState.FINISHED);
+        }
+        return finished;
+    }
+
+
+    // TODO LOGICA MERCA OP
+    public KernelLevelThread getCurrentKLT() {
+        if(!readyThreads.isEmpty()){
+            KernelLevelThread nextklt = readyThreads.poll();
+            return nextklt;
+        }else{
+            return null;
+        }
+
+    }
+
+    public boolean hasAvailableKLT() {
+        return !readyThreads.isEmpty();
+    }
 }

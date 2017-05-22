@@ -1,34 +1,25 @@
 package main.model;
 
-import main.model.process.Process;
+import main.model.thread.KernelLevelThread;
 
-public class Core {
+public class Core{
 
-    private Process currentProcess;
+    private int id;
+    private KernelLevelThread currentKLT; // porque puedo correr dos klt del mismo proceso en distintos cores (PLS NESTOR)
 
-    private Integer ID;
-
-    public Core(Integer id) {
-        this.ID = id;
+    public Core (int id){
+        this.id = id;
     }
 
-    public boolean isRunning() {
-        return currentProcess != null;
+    public boolean isRunning(){
+        return currentKLT != null;
     }
 
-    public Process getCurrentProcess() {
-        return currentProcess;
+    public void setCurrentKLT(KernelLevelThread currentKLT) {
+        this.currentKLT = currentKLT;
     }
 
-    public void setCurrentProcess(Process currentThread) {
-        this.currentProcess = currentThread;
-    }
-
-    public Integer getID() {
-        return ID;
-    }
-
-    public void free() {
-        setCurrentProcess(null);
+    public KernelLevelThread getCurrentKLT() {
+        return currentKLT;
     }
 }
