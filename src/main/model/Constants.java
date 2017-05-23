@@ -12,6 +12,8 @@ public interface Constants {
 
     int MIN_KLT = 1;
 
+    int MIN_ULT = 1;
+
     int MAX_BURSTS = 12;
 
     int MAX_IO_DEVICES = 3;

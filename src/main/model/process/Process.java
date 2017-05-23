@@ -1,12 +1,6 @@
 package main.model.process;
 
 import main.model.thread.KernelLevelThread;
-import main.model.thread.Thread;
-import main.model.thread.ThreadState;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -15,22 +9,21 @@ import java.util.Queue;
 
 public class Process {
 
-    private static int processCount;
-
     private ProcessState state;
-    private List<KernelLevelThread> klt;
+    private List<KernelLevelThread> threads;
     private Queue<KernelLevelThread> blockedThreads;
     private Queue<KernelLevelThread> readyThreads;
 
     private List<KernelLevelThread> finishedThreads;
 
-    private int pid;
+    /** Process ID */
+    private final int PID;
 
-    public Process (){
-        this.pid = processCount++;
+    public Process (int PID, List<KernelLevelThread> threads) {
+        this.PID = PID;
         this.state = ProcessState.NEW;
 
-        klt = new ArrayList<>();
+        this.threads = threads;
         blockedThreads = new LinkedList<>();
         readyThreads = new LinkedList<>();
         finishedThreads = new ArrayList<>();
@@ -40,8 +33,8 @@ public class Process {
         return state;
     }
 
-    public int getPid() {
-        return pid;
+    public int getPID() {
+        return PID;
     }
 
     public void setState(ProcessState state) {
@@ -49,7 +42,7 @@ public class Process {
     }
 
     public boolean isBlocked() {
-        boolean blocked = blockedThreads.size() == klt.size();
+        boolean blocked = blockedThreads.size() == threads.size();
         if (blocked) {
             setState(ProcessState.BLOCKED);
         }
@@ -57,7 +50,7 @@ public class Process {
     }
 
     public boolean isFinished() {
-        boolean finished = klt.size() == finishedThreads.size();
+        boolean finished = threads.size() == finishedThreads.size();
         if (finished) {
             setState(ProcessState.FINISHED);
         }
@@ -78,5 +71,29 @@ public class Process {
 
     public boolean hasAvailableKLT() {
         return !readyThreads.isEmpty();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (!obj.getClass().equals(this.getClass())) {
+            return false;
+        }
+
+        Process process = (Process)obj;
+        return process.PID == PID;
+    }
+
+    @Override
+    public int hashCode() {
+        return PID;
+    }
+
+    @Override
+    public String toString() {
+        return "P" + PID;
     }
 }

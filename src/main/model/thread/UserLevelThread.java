@@ -6,12 +6,12 @@ import java.util.List;
 
 /**
  */
-public class UserLevelThread extends Thread{
+public class UserLevelThread extends Thread {
 
-    private int parent;
+    private final int parentKltID;
 
-    public UserLevelThread(List<Burst> burstList, int parent) {
-        super(burstList);
-        this.parent = parent;
+    public UserLevelThread(int TID, int parentKltID, int parentPID, List<Burst> burstList) {
+        super(TID, parentPID, burstList);
+        this.parentKltID = parentKltID;
     }
 }

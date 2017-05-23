@@ -5,7 +5,6 @@ import main.model.process.Process;
 import main.model.process.Scheduler;
 import main.model.process.SchedulerFIFO;
 import main.model.process.SchedulerRoundRobin;
-import main.model.thread.KernelLevelThread;
 
 import java.util.List;
 import java.util.Map;
@@ -51,7 +50,8 @@ public class Simulation {
             if (running) {
                 scheduler.execute(processes.get(time));
 
-                gantt.print(time, scheduler);
+                gantt.addTraceNode(scheduler);
+                gantt.print(time);
                 time++;
 
                 try {

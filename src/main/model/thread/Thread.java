@@ -4,19 +4,20 @@ import main.model.Burst;
 
 import java.util.List;
 
-public class Thread {
+public abstract class Thread {
 
     private List<Burst> bursts;
     private ThreadState state;
     private int currentBurstIndex;
-    private Burst currentBurst;
 
-    public Thread (List<Burst> burstList){
-        this.bursts=burstList;
-    }
+    /** Thread ID and parent Process ID */
+    private final int TID;
+    private final int parentPID;
 
-    public void setThreadState(ThreadState state){
-        this.state=state;
+    public Thread (int TID, int parentPID, List<Burst> burstList){
+        this.TID = TID;
+        this.parentPID = parentPID;
+        this.bursts = burstList;
     }
 
     /**
@@ -44,14 +45,43 @@ public class Thread {
         return burstFinished;
     }
 
+    public Burst getCurrentBurst() {
+        return bursts.get(currentBurstIndex);
+    }
+
     public ThreadState getState() {
         return state;
     }
 
-    public Burst getCurrentBurst() {
-//        if (state == ThreadState.FINISHED) {
-//            return null;
-//        }
-        return bursts.get(currentBurstIndex);
+    public void setState(ThreadState state){
+        this.state=state;
+    }
+
+    public int getParentPID() {
+        return parentPID;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (!obj.getClass().equals(this.getClass())) {
+            return false;
+        }
+
+        Thread thread = (Thread) obj;
+        return thread.TID == TID;
+    }
+
+    @Override
+    public int hashCode() {
+        return TID;
+    }
+
+    @Override
+    public String toString() {
+        return getClass().equals(KernelLevelThread.class) ? "K" : "U"  + TID;
     }
 }

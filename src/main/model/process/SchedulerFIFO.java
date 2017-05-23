@@ -7,7 +7,7 @@ import main.model.thread.ThreadState;
 
 /**
  */
-public class SchedulerFIFO extends Scheduler{
+public class SchedulerFIFO extends Scheduler {
 
     public SchedulerFIFO (int coreCount, int ioCount){
         super(coreCount,ioCount);
@@ -34,7 +34,7 @@ public class SchedulerFIFO extends Scheduler{
             }
 
             KernelLevelThread klt = core.getCurrentKLT();
-            Process process = processes.get(klt.getParentID());
+            Process process = processes.get(klt.getParentPID());
             if (klt.execute()) { // se bloqueo o termino el thread
                 ThreadState state = klt.getState();
 

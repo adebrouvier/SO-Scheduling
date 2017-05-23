@@ -1,30 +1,21 @@
 package main.model.thread;
 
-import main.model.Burst;
-
-import java.util.ArrayList;
 import java.util.List;
 
-public class KernelLevelThread extends Thread{
+public class KernelLevelThread extends Thread {
 
-    private List<UserLevelThread> ults;
-    private UserLevelThread blockedUlt;
-    private int parent;
+    private List<UserLevelThread> threads;
+    private UserLevelThread blockedThread;  // solo puede haber un solo ULT bloqueado
     private ThreadLibraryType threadLibraryType;
 
-    public KernelLevelThread( List<Burst> burstList, int parent, ThreadLibraryType threadLibraryType) {
-        super(burstList);
-        this.parent = parent;
+    public KernelLevelThread(int TID, int parentPID, List<UserLevelThread> threads, ThreadLibraryType threadLibraryType) {
+        super(TID, parentPID, null);
+        this.threads = threads;
         this.threadLibraryType = threadLibraryType;
     }
 
-    public int getParentID(){
-        return parent;
-    }
-
     public boolean execute() {
-        // si tiene ults, usar la biblioteca
-        // sino, usar super.execute();
+        //TODO reemplazar por biblioteca de hilos
         return super.execute();
     }
 }

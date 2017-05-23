@@ -5,7 +5,7 @@ import main.model.thread.KernelLevelThread;
 public class Core{
 
     private int id;
-    private KernelLevelThread currentKLT; // porque puedo correr dos klt del mismo proceso en distintos cores (PLS NESTOR)
+    private KernelLevelThread currentKLT; // puedo correr dos klt del mismo proceso en distintos cores
 
     public Core (int id){
         this.id = id;

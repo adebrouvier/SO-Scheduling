@@ -59,8 +59,8 @@ public abstract class Scheduler {
     public void runIO() {
 
         for (IO io : IODevices) {
-
-            Process ready = processes.get(io.getReady().getParentID());
+            // agrego el proceso desbloqueado de nuevo a la ready queue
+            Process ready = processes.get(io.getReady().getParentPID());
 
             if (ready != null) {
                 readyQueue.add(ready);
@@ -76,7 +76,7 @@ public abstract class Scheduler {
 
         for (Process process : processes) {
             process.setState(ProcessState.READY);
-            this.processes.put(process.getPid(),process);
+            this.processes.put(process.getPID(),process);
         }
 
         readyQueue.addAll(processes);

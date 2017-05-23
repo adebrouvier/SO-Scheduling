@@ -15,19 +15,19 @@ public class Burst {
         this.remainingTime = time;
     }
 
+    public boolean execute() {
+
+        if (remainingTime > 0)
+            remainingTime--;
+
+        return remainingTime == 0;
+    }
+
     public int getType (){
         return this.type;
     }
 
     public int getTime (){
         return time;
-    }
-
-    public boolean execute() {
-
-        if (remainingTime>0)
-            remainingTime--;
-
-        return remainingTime == 0;
     }
 }

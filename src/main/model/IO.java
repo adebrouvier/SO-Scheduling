@@ -9,38 +9,36 @@ import java.util.Queue;
  */
 public class IO {
 
-    private int id;
+    private final int id;
     private Queue<KernelLevelThread> blockedKlts;
     private KernelLevelThread currentKlt;
-    private KernelLevelThread readyKlt; //TODO agregar próximo instante
+    private KernelLevelThread readyKlt;
 
     public IO (int id){
-        this.id=id;
+        this.id = id;
         blockedKlts = new LinkedList<>();
-    }
-
-    public boolean isBusy(){
-        return currentKlt != null;
-    }
-
-    private void setCurrent() {
-        currentKlt = blockedKlts.poll();
     }
 
     public void execute() {
 
         if (!isBusy()) {
-            setCurrent();
+            currentKlt = blockedKlts.poll();
         }
 
         if (isBusy()) {
-            if (currentKlt.execute()) { // los procesos siempre terminan con burst de cpu entonces no es necesario checkear
+            if (currentKlt.execute()) {
+                // los threads siempre terminan con burst de cpu entonces
+                // no es necesario checkear si el thread esta terminado
                 //TODO aca hay que actualizar las listas de ready en process
                 readyKlt = currentKlt;
                 currentKlt = null;
             }
         }
 
+    }
+
+    public boolean isBusy(){
+        return currentKlt != null;
     }
 
     /**
