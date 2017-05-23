@@ -1,6 +1,7 @@
 package main.controller.configuration;
 
 import main.model.process.Process;
+import main.model.thread.UserLevelThread;
 
 import java.util.List;
 import java.util.Map;
@@ -8,12 +9,13 @@ import java.util.Map;
 public class Configuration {
 
     private Map<Integer,List<Process>> processList;
+    private Map<Integer, List<UserLevelThread>> threads;
     private Integer cores;
-    private String threadLibrary;
+    private Integer IOCount;
     private String processScheduling;
+    private String threadLibrary;
     private Integer schedulingQuantum;
     private Integer threadQuantum;
-    private Integer IOCount;
 
     public Configuration(Map<Integer,List<Process>> processList, Integer cores,
                          String threadLibrary, String processScheduling, int ioCount, int schedulingQuantum, int threadQuantum) {
@@ -62,4 +64,7 @@ public class Configuration {
         return threadQuantum;
     }
 
+    public Map<Integer, List<UserLevelThread>> getThreads() {
+        return threads;
+    }
 }

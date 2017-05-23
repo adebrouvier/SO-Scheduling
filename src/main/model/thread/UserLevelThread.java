@@ -10,8 +10,12 @@ public class UserLevelThread extends Thread {
 
     private final int parentKltID;
 
-    public UserLevelThread(int TID, int parentKltID, int parentPID, List<Burst> burstList) {
-        super(TID, parentPID, burstList);
+    public UserLevelThread(int parentKltID, int parentPID, List<Burst> burstList) {
+        super(parentPID, burstList);
         this.parentKltID = parentKltID;
+    }
+
+    public int getParentKltID() {
+        return parentKltID;
     }
 }

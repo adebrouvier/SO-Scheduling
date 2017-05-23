@@ -9,13 +9,13 @@ import java.util.Queue;
  */
 public class IO {
 
-    private final int id;
+    private final int ID;
     private Queue<KernelLevelThread> blockedKlts;
     private KernelLevelThread currentKlt;
     private KernelLevelThread readyKlt;
 
-    public IO (int id){
-        this.id = id;
+    public IO (int ID){
+        this.ID = ID;
         blockedKlts = new LinkedList<>();
     }
 
@@ -49,7 +49,15 @@ public class IO {
         return readyKlt;
     }
 
+    public KernelLevelThread getCurrentKlt() {
+        return currentKlt;
+    }
+
     public void add(KernelLevelThread klt) {
         blockedKlts.add(klt);
+    }
+
+    public int getID() {
+        return ID;
     }
 }

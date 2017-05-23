@@ -18,9 +18,10 @@ public class Process {
 
     /** Process ID */
     private final int PID;
+    private static int processCount;
 
-    public Process (int PID, List<KernelLevelThread> threads) {
-        this.PID = PID;
+    public Process(List<KernelLevelThread> threads) {
+        this.PID = ++processCount;
         this.state = ProcessState.NEW;
 
         this.threads = threads;
@@ -67,6 +68,10 @@ public class Process {
             return null;
         }
 
+    }
+
+    public List<KernelLevelThread> getThreads() {
+        return threads;
     }
 
     public boolean hasAvailableKLT() {

@@ -2,6 +2,8 @@ package main.model.process;
 
 import main.model.Core;
 import main.model.IO;
+import main.model.thread.Thread;
+import main.model.thread.ThreadState;
 
 import java.util.*;
 
@@ -45,13 +47,16 @@ public abstract class Scheduler {
     /**
      *
      * @param processes new processes created in this instant of time
+     * @param threads new threads created in this instant of time
      */
-    public boolean execute(Collection<Process> processes) {
-        runIO();                 // ejecuto io
+    public boolean execute(Collection<Process> processes, Collection<? extends Thread> threads) {
+        runIO();                    // ejecuto io
 
-        addProcesses(processes); // agrego los procesos nuevos si los hubiere
+        addProcesses(processes);    // agrego los procesos nuevos si los hubiere
 
-        executeAlgorithm();      // ejecuto el proceso correspondiente segun la planificacion
+        addThreads(threads);        // agrego los threads nuevos si los hubiere
+
+        executeAlgorithm();         // ejecuto el proceso correspondiente segun la planificacion
 
         return false;
     }
@@ -72,15 +77,44 @@ public abstract class Scheduler {
 
     public abstract void executeAlgorithm();
 
-    public void addProcesses(Collection<Process> processes) {
-
+    /**
+     * TODO Each process arrival time is the minimum of its respective ULTs arrival times
+     * @param processes
+     */
+    private void addProcesses(Collection<Process> processes) {
         for (Process process : processes) {
             process.setState(ProcessState.READY);
-            this.processes.put(process.getPID(),process);
+            this.processes.put(process.getPID(), process);
         }
 
         readyQueue.addAll(processes);
-
     }
 
+    /**
+     * Activates threads.
+     * @param threads
+     */
+    private void addThreads(Collection<? extends Thread> threads) {
+        for (Thread thread : threads) {
+            thread.setState(ThreadState.READY);
+            // TODO add SLEEP state
+            // if (el proceso padre estaba dormido) { // un proceso esta dormido cuando no tiene mas ults para correr en ese instante  pero todavia no termino
+            //      readyQueue.add(proceso padre);
+            // }
+        }
+    }
+
+    public List<Process> getProcesses() {
+        List<Process> list = new ArrayList<>();
+        list.addAll(processes.values());
+        return list;
+    }
+
+    public List<Core> getCores() {
+        return cores;
+    }
+
+    public List<IO> getIODevices() {
+        return IODevices;
+    }
 }

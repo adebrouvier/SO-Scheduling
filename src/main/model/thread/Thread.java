@@ -14,8 +14,15 @@ public abstract class Thread {
     private final int TID;
     private final int parentPID;
 
-    public Thread (int TID, int parentPID, List<Burst> burstList){
-        this.TID = TID;
+    private static int KLTCount;
+    private static int ULTCount;
+
+    public Thread(int parentPID, List<Burst> burstList) {
+        if (this.getClass().equals(UserLevelThread.class)) {
+            TID = ++ULTCount;
+        } else {
+            TID = ++KLTCount;
+        }
         this.parentPID = parentPID;
         this.bursts = burstList;
     }
@@ -55,6 +62,10 @@ public abstract class Thread {
 
     public void setState(ThreadState state){
         this.state=state;
+    }
+
+    public int getTID() {
+        return TID;
     }
 
     public int getParentPID() {

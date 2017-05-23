@@ -5,17 +5,18 @@ import main.model.process.Process;
 import main.model.process.Scheduler;
 import main.model.process.SchedulerFIFO;
 import main.model.process.SchedulerRoundRobin;
+import main.model.thread.UserLevelThread;
 
 import java.util.List;
 import java.util.Map;
 
 public class Simulation {
 
-    // procesos separados por arrival time;
+    /** Arrival time -> processes/threads */
     private Map<Integer, List<Process>> processes;
+    private Map<Integer, List<UserLevelThread>> threads;
 
     private Scheduler scheduler;
-
     private Gantt gantt;
 
     private int time;
@@ -34,7 +35,7 @@ public class Simulation {
         }
 
         processes = cfg.getProcesses();
-
+        threads = cfg.getThreads();
         time = 0;
     }
 
@@ -48,7 +49,7 @@ public class Simulation {
             // TODO check input (pause, resume, etc)
 
             if (running) {
-                scheduler.execute(processes.get(time));
+                scheduler.execute(processes.get(time), threads.get(time));
 
                 gantt.addTraceNode(scheduler);
                 gantt.print(time);

@@ -4,11 +4,11 @@ import main.model.thread.KernelLevelThread;
 
 public class Core{
 
-    private int id;
+    private int ID;
     private KernelLevelThread currentKLT; // puedo correr dos klt del mismo proceso en distintos cores
 
-    public Core (int id){
-        this.id = id;
+    public Core (int ID){
+        this.ID = ID;
     }
 
     public boolean isRunning(){
@@ -21,5 +21,9 @@ public class Core{
 
     public KernelLevelThread getCurrentKLT() {
         return currentKLT;
+    }
+
+    public int getID() {
+        return ID;
     }
 }
