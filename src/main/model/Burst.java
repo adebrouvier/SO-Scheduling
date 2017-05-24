@@ -30,4 +30,8 @@ public class Burst {
     public int getTime (){
         return time;
     }
+
+    public int getRemainingTime() {
+        return remainingTime;
+    }
 }
