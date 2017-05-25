@@ -1,28 +1,33 @@
 package main.model.thread;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
 public class FIFO implements Algorithm{
 
+    public FIFO(){
+    }
+
     @Override
-    public UserLevelThread execute(List<UserLevelThread> ults, UserLevelThread runningUlt) {
+    public TNode execute(Queue<UserLevelThread> queue, UserLevelThread runningUlt) {
         //Que esto funcione, depende de como pongamos los ults en la lista. Ver como laburamos con arrival time y "desbloquear" threads
-        Queue<UserLevelThread> queue = (Queue<UserLevelThread>) ults; //No se si esta truchada funciona.
+        TNode returnNode;
         if(runningUlt == null) {
             if (!queue.isEmpty()) {
                 runningUlt = queue.poll();
             }
+        }
             //Esto se repite bastante, se podria hacer una funcion.
             if(runningUlt.execute()){
                 if(runningUlt.getState() == ThreadState.BLOCKED){
-                    //Settear el ult como el bloqueado. Pensar como lo vamos a implementar
-                }else if(runningUlt.getState() == ThreadState.FINISHED){
-                    //Ponerlo en una lista de terminados?
+                    returnNode = new TNode(null, runningUlt);
+                }else{
+                    returnNode = new TNode(null, null);
                 }
-                return null;
+                return returnNode;
             }
-        }
-        return runningUlt;
+        returnNode = new TNode(runningUlt, null);
+        return returnNode;
     }
 }
