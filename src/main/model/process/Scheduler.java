@@ -97,10 +97,10 @@ public abstract class Scheduler {
     private void addThreads(Collection<? extends Thread> threads) {
         for (Thread thread : threads) {
             thread.setState(ThreadState.READY);
-            // TODO add SLEEP state
-            // if (el proceso padre estaba dormido) { // un proceso esta dormido cuando no tiene mas ults para correr en ese instante  pero todavia no termino
-            //      readyQueue.add(proceso padre);
-            // }
+            Process parent = processes.get(thread.getParentPID());
+            if (parent.getState().equals(ProcessState.SLEEP)) {
+                  readyQueue.add(parent);
+            }
         }
     }
 
