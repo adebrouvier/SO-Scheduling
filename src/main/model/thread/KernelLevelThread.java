@@ -63,6 +63,10 @@ public class KernelLevelThread extends Thread {
         return readyThreads;
     }
 
+    public List<UserLevelThread> getThreads (){
+        return threads;
+    }
+
     public boolean isFinished() {
         for (UserLevelThread ult : threads) {
             if (ult.getState() != ThreadState.FINISHED) {
