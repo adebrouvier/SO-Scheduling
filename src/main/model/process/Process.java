@@ -11,7 +11,7 @@ public class Process {
 
     private ProcessState state;
     private List<KernelLevelThread> threads;
-    private Queue<KernelLevelThread> blockedThreads;
+    private KernelLevelThread blockedThread;
     private Queue<KernelLevelThread> readyThreads;
 
     private List<KernelLevelThread> finishedThreads;
@@ -25,7 +25,6 @@ public class Process {
         this.state = ProcessState.NEW;
 
         this.threads = threads;
-        blockedThreads = new LinkedList<>();
         readyThreads = new LinkedList<>();
         finishedThreads = new ArrayList<>();
     }
@@ -43,7 +42,7 @@ public class Process {
     }
 
     public boolean isBlocked() {
-        boolean blocked = blockedThreads.size() == threads.size();
+        boolean blocked = blockedThread != null;
         if (blocked) {
             setState(ProcessState.BLOCKED);
         }
@@ -61,13 +60,7 @@ public class Process {
 
     // TODO LOGICA MERCA OP
     public KernelLevelThread getCurrentKLT() {
-        if(!readyThreads.isEmpty()){
-            KernelLevelThread nextklt = readyThreads.poll();
-            return nextklt;
-        }else{
-            return null;
-        }
-
+        return readyThreads.poll();
     }
 
     public List<KernelLevelThread> getThreads() {
@@ -100,5 +93,22 @@ public class Process {
     @Override
     public String toString() {
         return "P" + PID;
+    }
+
+    public KernelLevelThread getThread(int TID) {
+        for (KernelLevelThread klt : threads) {
+            if (klt.getTID() == TID) {
+                return klt;
+            }
+        }
+        return null;
+    }
+
+    public void setBlocked(KernelLevelThread blocked) {
+        this.blockedThread = blocked;
+    }
+
+    public void addReady(KernelLevelThread klt) {
+        readyThreads.add(klt);
     }
 }

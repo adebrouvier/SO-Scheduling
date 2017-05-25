@@ -1,5 +1,6 @@
 package main.model.thread;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
@@ -14,29 +15,30 @@ public class RR implements Algorithm {
     }
 
     @Override
-    public UserLevelThread execute(List<UserLevelThread> ults, UserLevelThread runningUlt) {
-        Queue<UserLevelThread> queue = (Queue<UserLevelThread>) ults;
+    public TNode execute(Queue<UserLevelThread> queue, UserLevelThread runningUlt) {
+        TNode returnNode;
         if(runningUlt == null){
             if(!queue.isEmpty()){
                 runningUlt = queue.poll();
             }
 
         }
-            if(runningUlt.execute()){
-                if(runningUlt.getState() == ThreadState.BLOCKED){
-                    //Settear el ult como el bloqueado. Pensar como lo vamos a implementar
-                }else if(runningUlt.getState() == ThreadState.FINISHED){
-                    //Ponerlo en una lista de terminados?
+            if(runningUlt.execute()) {
+                if (runningUlt.getState() == ThreadState.BLOCKED) {
+                    returnNode = new TNode(null, runningUlt);
+                } else{
+                    returnNode = new TNode(null, null);
                 }
                 currentQuantum = 0;
-                return null;
+                return returnNode;
             }
             currentQuantum++;
             if(currentQuantum == quantum){
                 currentQuantum=0;
                 queue.add(runningUlt);
-                runningUlt = null;
+                returnNode = new TNode(null, null);
             }
-        return runningUlt;
+        returnNode = new TNode(runningUlt, null);
+        return returnNode;
     }
 }

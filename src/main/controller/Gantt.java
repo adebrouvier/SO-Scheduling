@@ -68,7 +68,7 @@ public class Gantt {
         Burst currentBurst;
         for (Process process : scheduler.getProcesses()) {
             for (KernelLevelThread klt : process.getThreads()) {
-                for (UserLevelThread ult : klt.getThreads()) {
+                for (UserLevelThread ult : klt.getReadyThreads()) {
                     uid = ult.getTID();
                     kid = klt.getTID(); // same as ult.getParentKltID();
                     pid = process.getPID(); // same as ult.getParentPID() o klt.getParentPID();

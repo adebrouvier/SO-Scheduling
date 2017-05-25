@@ -39,26 +39,23 @@ public class SchedulerFIFO extends Scheduler {
                 ThreadState state = klt.getState();
 
                 if (state == ThreadState.BLOCKED) {
-                    //TODO actualizar las listas de bloqueados en process
                     IO io = IODevices.get(klt.getCurrentBurst().getType());
                     io.add(klt);
 
-                    // if (todos los klt del proceso estan bloqueados)
-                    if (process.isBlocked()) { // TODO update lists
-                        //process.setState(ProcessState.BLOCKED);
-                        blockedQueue.add(process);
-                    }
+                    process.setBlocked(klt);
+                    process.setState(ProcessState.BLOCKED);
+                    blockedQueue.add(process);
                 } else if (state == ThreadState.FINISHED) {
                     // if (todos los klt del proceso estan finished)
                     if (process.isFinished()) {
-                        //process.setState(ProcessState.FINISHED);
+                        process.setState(ProcessState.FINISHED);
                     }
                 }
             }
 
             //el thread sigue corriendo
 
-            if (process.hasAvailableKLT()) {
+            if (!process.hasAvailableKLT()) {//Checkea que si al proceso le queda algo para correr.
                 readyQueue.poll();
             }
 
