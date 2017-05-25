@@ -3,6 +3,7 @@ package main.controller.configuration;
 import main.model.Burst;
 import main.model.process.Process;
 import main.model.thread.KernelLevelThread;
+import main.model.thread.ThreadLibraryType;
 import main.model.thread.UserLevelThread;
 import org.apache.commons.cli.*;
 import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
@@ -15,14 +16,14 @@ import java.util.regex.Pattern;
 public class ConfigurationLoader {
 
     private String fileName = "./res/settings.so";
-    private Integer processes = 1;
-    private Integer bursts = 1;
+    private int processes = 1;
+    private int bursts = 1;
     private String processPlanification = "FIFO";
     private String threadLibrary = "FIFO";
-    private Integer cores=1;
-    private Integer IOCount=1;
-    private Integer schedulingQuantum=1;
-    private Integer threadQuantum=2;
+    private int cores=1;
+    private int IOCount=1;
+    private int schedulingQuantum=1;
+    private int threadQuantum=2;
 
     public ConfigurationLoader(String [] args){
 
@@ -30,10 +31,9 @@ public class ConfigurationLoader {
         Options options = new Options();
 
         // add option
-        String[] optionList = {"p","b","c","ps","tl","io"};
-        String[] quantumOptionList = {"sq","tq"};
+        String[] optionList = {"file","p","b","c","ps","tl","io"};
         //String[] longOption = {"processes","bursts","cores","scheduling","threadlibrary","iodevices"};
-        String[] optionDescriptions = {"number of processes","number of bursts",
+        String[] optionDescriptions = {"filename of input","number of processes","number of bursts",
                 "number of cores","type of process scheduling","thread library algorithm","number of io devices"};
 
         for (int i = 0;i < optionList.length;i++) {
@@ -48,13 +48,17 @@ public class ConfigurationLoader {
         CommandLine cmd;
         HelpFormatter formatter = new HelpFormatter();
 
-        //TODO: comando para help
-        formatter.printHelp("main",options);
+        //formatter.printHelp("main",options);
 
         try {
             cmd = parser.parse( options, args);
 
             String pOption;
+
+            if (cmd.hasOption("f")){
+                pOption = cmd.getOptionValue("f");
+                fileName = pOption;
+            }
 
             if (cmd.hasOption("p")) {
                 pOption = cmd.getOptionValue("p");
@@ -100,7 +104,7 @@ public class ConfigurationLoader {
                 if (m.matches()){
                     threadQuantum=Integer.valueOf(threadLibrary.split("_")[1]);
 
-                    if (threadQuantum <= 0 || threadQuantum.equals(schedulingQuantum)) {
+                    if (threadQuantum <= 0 || threadQuantum == schedulingQuantum) {
                         System.err.println("Thread RR quantum has to be positive and different from Scheduling Quantum.");
                         System.exit(0);
                     }
@@ -117,6 +121,7 @@ public class ConfigurationLoader {
         } catch (ParseException exp) {
             // oops, something went wrong
             System.err.println( "Parsing failed.  Reason: " + exp.getMessage() );
+            System.exit(1);
         }
     }
     //TODO validation and exit (0)
@@ -124,116 +129,181 @@ public class ConfigurationLoader {
 
         File file = new File(fileName);
 
-        List<Process> processList = new ArrayList<>();
-
-        Map<Integer,List<Process>> processArrivals = new HashMap<>();
+        Map <Integer,Map<Integer,List<UserLevelThread>>> processList = new HashMap<>();
+        Map <Integer,Integer> ultArrivalTimes = new HashMap<>(); // <ID,arrivalTime>
 
         try {
             Scanner sc = new Scanner(file);
 
-            int[] numberOfThreads = new int[processes];
+            List<Integer> burstTypes = new ArrayList<>();
 
-            int[] arrivalTimes = new int[processes];
+            sc.next(); //A
 
-            // Obtener tiempos de llegada
-            for (int i = 0; i < processes; i++){
-                arrivalTimes[i] = sc.nextInt();
+            for (int i = 0; i < bursts; i++) {
+                String burst = sc.next();
+                if (burst.equals("C")) {
+                    burstTypes.add(0);
+                } else {
+                    int ioDevice = Integer.valueOf(burst);
+
+                    if (ioDevice <= IOCount && ioDevice > 0) {
+                        burstTypes.add(ioDevice);
+                    } else {
+                        System.err.print("Invalid IO device number.");
+                        System.exit(1);
+                    }
+                }
             }
 
-            // Obtain number of threads for each process
-            for (int i = 0; i < processes; i++){
-                numberOfThreads[i] = sc.nextInt();
-            }
+            checkBurst(bursts, burstTypes);
 
-            Burst[] burst = new Burst[bursts];
+            for (int i = 0; i < processes*3; i++) {
 
-            // Obtain burst type for each burst
-            for (int i = 0; i < bursts ; i++){
-                burst[i] = new Burst(0,sc.next());
-            }
+                String identifier = sc.next();
 
-            for (int i = 0; i< processes ; i++){
+                Pattern p1 = Pattern.compile("P[0-9]+_K[0-9]+_U[0-9]+");
 
-                Map<Integer,KernelLevelThread> threadList = new HashMap<>();
+                Matcher m1 = p1.matcher(identifier);
 
-                for (int j = 0; j<numberOfThreads[i] ; j++){
+                String[] tokens = identifier.split("_");
 
-                    String threadTypeInput = sc.next();
+                int processNumber = Integer.valueOf(tokens[0].substring(1)) - 1;
+                int kernelThreadNumber = Integer.valueOf(tokens[1].substring(1)) - 1;
+                int userThreadNumber = Integer.valueOf(tokens[2].substring(1)) - 1;
 
-                    for (int k = 0; k < bursts ; k++){
-                        burst[k].setTime(sc.nextInt());
+                if (m1.matches()) {
+
+                    int threadArrivalTime = sc.nextInt();
+
+                    if (threadArrivalTime < 0){
+                        System.err.println("Arrival time must be greater than 0.");
+                        System.exit(1);
                     }
 
-                    Pattern p1 = Pattern.compile("P[0-9]+_K[0-9]+_U[0-9]+");
-                    Pattern p2 = Pattern.compile("P[0-9]+_K[0-9]+");
+                    ultArrivalTimes.put(userThreadNumber,threadArrivalTime);
 
-                    Matcher m1 = p1.matcher(threadTypeInput);
-                    Matcher m2 = p2.matcher(threadTypeInput);
+                    List<Burst> burstList = new ArrayList<>();
 
-                    String[] tokens = threadTypeInput.split("_");
+                    for (int j = 0 ; j < bursts ; j++){
+                        int burstTime = sc.nextInt();
 
-                    int kernelThreadNumber = Integer.valueOf(tokens[1].substring(1))-1;
+                        if (burstTime < 0){
+                            System.err.println("Burst time must be greater than 0.");
+                            System.exit(1);
+                        }
 
-                    if (m1.matches()){
-
-                        KernelLevelThread klt = threadList.get(kernelThreadNumber);
-
-                        if (klt == null)
-                            klt = new KernelLevelThread(burst);
-
-                        UserLevelThread ult = new UserLevelThread(burst);
-
-                        klt.addUserLevelThread(ult);
-
-                        threadList.put(kernelThreadNumber,klt);
-
-                    }else if (m2.matches()){
-
-                        KernelLevelThread klt = new KernelLevelThread(burst);
-                        threadList.put(kernelThreadNumber,klt);
-
-                    }else{
-                        System.err.println("Wrong parameters");
-                        System.exit(0);
+                        burstList.add(new Burst(burstTypes.get(j),burstTime));
                     }
 
+                    Map<Integer,List<UserLevelThread>> kernelThreadList = processList.get(processNumber);
+
+                    if (kernelThreadList == null){
+                        kernelThreadList = new HashMap<>();
+                    }
+
+                    List<UserLevelThread> ults = kernelThreadList.get(kernelThreadNumber);
+
+                    if (ults == null){
+                        ults = new ArrayList<>();
+                    }
+
+                    UserLevelThread u = new UserLevelThread(kernelThreadNumber,processNumber,burstList);
+                    ults.add(u);
+                    kernelThreadList.put(kernelThreadNumber,ults);
+                    processList.put(processNumber,kernelThreadList);
+
+                } else {
+                    System.err.println("Wrong parameters");
+                    System.exit(1);
                 }
 
-                processList.add(new Process(i,arrayifi(threadList)));
-            }
-
-            for(int i = 0 ; i < processes ; i++){
-
-                List<Process> instant = processArrivals.get(arrivalTimes[i]);
-
-                if (instant == null){
-                    instant =  new ArrayList<>();
-                }
-
-                instant.add(processList.get(i));
-
-                processArrivals.put(arrivalTimes[i],instant);
             }
 
         }catch (Exception e){
             e.printStackTrace();
         }
 
-        return new Configuration(processArrivals, cores, threadLibrary, processPlanification,IOCount,0,0);
-    }
+        List<Process> process = new ArrayList<>();
 
-    private KernelLevelThread[] arrayifi(Map<Integer,KernelLevelThread> threadList) {
+        for (Integer processNumber : processList.keySet()){
 
-        int size = threadList.size();
+           Map<Integer,List<UserLevelThread>> kltMap = processList.get(processNumber);
 
-        KernelLevelThread[] resul = new KernelLevelThread[size];
+           List<KernelLevelThread> kltList = new ArrayList<>();
 
-        for (int i = 0; i <size ; i++){
-            resul[i] = threadList.get(i);
+           for (Integer kltNumber : kltMap.keySet()){
+               KernelLevelThread k = new KernelLevelThread(processNumber,
+                       kltMap.get(kltNumber), ThreadLibraryType.valueOf(threadLibrary));
+               kltList.add(k);
+           }
+
+            process.add(new Process(kltList));
         }
 
-        return resul;
+        Map<Integer,List<Process>> processArrivals = new HashMap<>();
+        Map<Integer,List<UserLevelThread>> ultArrivals = new HashMap<>();
+
+        for (Process p : process){
+            for (KernelLevelThread k : p.getThreads()){
+                for (UserLevelThread u : k.getThreads()){
+
+                    Integer arrivalTime = ultArrivalTimes.get(u.getTID());
+
+                    List<UserLevelThread> arrivalList = ultArrivals.get(arrivalTime);
+
+                    if (arrivalList == null){
+                        arrivalList = new ArrayList<>();
+                    }
+
+                    arrivalList.add(u);
+
+                    ultArrivals.put(arrivalTime,arrivalList);
+                }
+            }
+        }
+
+
+        return new Configuration(processArrivals,ultArrivals,cores, threadLibrary,
+                processPlanification,IOCount,schedulingQuantum,threadQuantum);
     }
 
+    /**
+     * Checks if the number of bursts is corrects, if the first and last bursts are cpu and if bursts are interleaved
+     * @param bursts number of bursts
+     * @param burstTypes list with the type of each burst
+     */
+    private void checkBurst(Integer bursts, List<Integer> burstTypes) {
+        if (!(burstTypes.size() == bursts)){
+            System.err.println("Wrong number of bursts");
+            System.exit(1);
+        }
+
+        if (burstTypes.get(0) != 0){ // if first burst isnt CPU
+            System.err.println("First burst type must be CPU.");
+            System.exit(1);
+        }
+
+        for (int i = 0; i < burstTypes.size() ; i++){
+            if (i % 2 == 0){
+                if (burstTypes.get(i) != 0){
+                    System.err.println("Bursts must be intercalated.");
+                    System.exit(1);
+                }
+            }else{
+
+                if (i == burstTypes.size()-1){
+                    System.err.println("Last burst must be CPU.");
+                    System.exit(1);
+                }
+
+                if (burstTypes.get(i) == 0){
+                    System.err.println("Bursts must be intercalated.");
+                    System.exit(1);
+                }
+            }
+        }
+
+
+    }
 
 }

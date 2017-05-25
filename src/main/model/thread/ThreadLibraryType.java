@@ -3,5 +3,5 @@ package main.model.thread;
 /**
  */
 public enum ThreadLibraryType {
-    //TODO
+    FIFO,HRRN,RR,SPN,SRT
 }

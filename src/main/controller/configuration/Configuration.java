@@ -10,16 +10,17 @@ public class Configuration {
 
     private Map<Integer,List<Process>> processList;
     private Map<Integer, List<UserLevelThread>> threads;
-    private Integer cores;
-    private Integer IOCount;
+    private int cores;
+    private int IOCount;
     private String processScheduling;
     private String threadLibrary;
     private Integer schedulingQuantum;
     private Integer threadQuantum;
 
-    public Configuration(Map<Integer,List<Process>> processList, Integer cores,
+    public Configuration(Map<Integer,List<Process>> processList, Map<Integer, List<UserLevelThread>> threads, Integer cores,
                          String threadLibrary, String processScheduling, int ioCount, int schedulingQuantum, int threadQuantum) {
         this.processList = processList;
+        this.threads = threads;
         this.cores = cores;
         this.threadLibrary = threadLibrary;
         this.processScheduling = processScheduling;
@@ -28,15 +29,11 @@ public class Configuration {
         this.threadQuantum = threadQuantum;
     }
 
-    public Integer getCores() {
+    public int getCores() {
         return cores;
     }
 
-    public void setCores(Integer cores) {
-        this.cores = cores;
-    }
-
-    public String getThreadLibrary() {
+   public String getThreadLibrary() {
         return threadLibrary;
     }
 
@@ -44,7 +41,7 @@ public class Configuration {
         return processScheduling;
     }
 
-    public Integer getIOCount() {
+    public int getIOCount() {
         return IOCount;
     }
 
@@ -56,11 +53,7 @@ public class Configuration {
         return processList;
     }
 
-    public void setThreadLibrary(String threadLibrary) {
-            this.threadLibrary = threadLibrary;
-    }
-
-    public Integer getThreadQuantum() {
+    public int  getThreadQuantum() {
         return threadQuantum;
     }
 
