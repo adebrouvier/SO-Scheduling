@@ -1,6 +1,7 @@
 package main.model;
 
 import main.model.thread.KernelLevelThread;
+import main.model.thread.ThreadState;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -31,6 +32,7 @@ public class IO {
                 // no es necesario checkear si el thread esta terminado
                 //TODO aca hay que actualizar las listas de ready en process
                 readyKlt = currentKlt;
+                readyKlt.setState(ThreadState.READY);
                 currentKlt = null;
             }
         }

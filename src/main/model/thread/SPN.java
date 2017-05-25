@@ -1,7 +1,5 @@
 package main.model.thread;
 
-import javax.jws.soap.SOAPBinding;
-import java.util.List;
 import java.util.Queue;
 
 

@@ -2,8 +2,10 @@ package main.model.process;
 
 import main.model.Core;
 import main.model.IO;
+import main.model.thread.KernelLevelThread;
 import main.model.thread.Thread;
 import main.model.thread.ThreadState;
+import main.model.thread.UserLevelThread;
 
 import java.util.*;
 
@@ -65,10 +67,16 @@ public abstract class Scheduler {
 
         for (IO io : IODevices) {
             // agrego el proceso desbloqueado de nuevo a la ready queue
-            Process ready = processes.get(io.getReady().getParentPID());
+            KernelLevelThread klt = io.getReady();
 
-            if (ready != null) {
-                readyQueue.add(ready);
+            if (klt != null) {
+                Process process = processes.get(klt.getParentPID());
+                process.setState(ProcessState.READY);
+                process.addReady(klt);
+
+                if (process != null) {
+                    readyQueue.add(process);
+                }
             }
 
             io.execute();
@@ -98,6 +106,8 @@ public abstract class Scheduler {
         for (Thread thread : threads) {
             thread.setState(ThreadState.READY);
             Process parent = processes.get(thread.getParentPID());
+            parent.getThread(((UserLevelThread)thread).getParentKltID()).getReadyThreads().add((UserLevelThread) thread);
+
             if (parent.getState().equals(ProcessState.SLEEP)) {
                   readyQueue.add(parent);
             }
