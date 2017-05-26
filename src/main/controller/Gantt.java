@@ -18,10 +18,6 @@ public class Gantt {
 
     private List<TraceNode> trace;
 
-    public Gantt() {
-        trace = new ArrayList<>();
-    }
-
     /**
      * Adds a new column to the Gantt diagram
      * @param scheduler
@@ -35,6 +31,10 @@ public class Gantt {
         /////////////////
 
         trace.add(node);
+    }
+
+    public Gantt() {
+        trace = new ArrayList<>();
     }
 
     /**
@@ -92,19 +92,22 @@ public class Gantt {
 
         Queue<Process> readyQueue = scheduler.getReadyQueue();
 
-        System.out.println("READY THREADS:");
-        for (Process process : readyQueue) {
-            for (KernelLevelThread klt : process.getReadyThreads()) {
-                for (UserLevelThread ult : klt.getReadyThreads()) {
-                    System.out.println("P" + process.getPID() + "K" + klt.getTID() + "U" + ult.getTID());
-                }
-            }
-        }
-        System.out.println();
+//        System.out.println("READY THREADS:");
+//        for (Process process : readyQueue) {
+//            for (KernelLevelThread klt : process.getReadyThreads()) {
+//                for (UserLevelThread ult : klt.getReadyThreads()) {
+//                    System.out.println("P" + process.getPID() + "K" + klt.getTID() + "U" + ult.getTID());
+//                }
+//            }
+//        }
+//        System.out.println();
 
 
 
 //        System.out.println("RUNNING THREADS");
+//        for (Core core : scheduler.getCores()) {
+//            System.out.print("P" + process.getPID() + "K" + klt.getTID() + "U" + klt.getBlocked());
+//        }
 //        for (Process process : blockedQueue) {
 //            klt = process.getBlockedThread();
 //            System.out.print("P" + process.getPID() + "K" + klt.getTID() + "U" + klt.getBlocked());

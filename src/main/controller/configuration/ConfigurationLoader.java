@@ -158,7 +158,14 @@ public class ConfigurationLoader {
 
             for (int i = 0; i < processes*3; i++) {
 
-                String identifier = sc.next();
+                String identifier = "";
+
+                try {
+                    identifier = sc.next();
+                }catch (NoSuchElementException e){
+                    break;
+                    //TODO fix exception
+                }
 
                 Pattern p1 = Pattern.compile("P[0-9]+_K[0-9]+_U[0-9]+");
 

@@ -60,7 +60,9 @@ public abstract class Scheduler {
 
         addThreads(threads);        // agrego los threads nuevos si los hubiere
 
-        executeAlgorithm();         // ejecuto el proceso correspondiente segun la planificacion
+        for (Core core : cores) {
+            executeAlgorithm(core);         // ejecuto el proceso correspondiente segun la planificacion
+        }
 
         return false;
     }
@@ -116,7 +118,7 @@ public abstract class Scheduler {
         }
     }
 
-    public abstract void executeAlgorithm();
+    public abstract void executeAlgorithm(Core core);
 
     /**
      * TODO Each process arrival time is the minimum of its respective ULTs arrival times

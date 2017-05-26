@@ -1,8 +1,5 @@
 package main.model;
 
-/**
- * TODO checkear burst limit (12)
- */
 public class Burst {
 
     private int type;

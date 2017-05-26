@@ -31,7 +31,6 @@ public class IO {
             if (currentKlt.executeIO(ID)) {
                 // los threads siempre terminan con burst de cpu entonces
                 // no es necesario checkear si el thread esta terminado
-                //TODO aca hay que actualizar las listas de ready en process
                 readyKlt = currentKlt;
                 currentKlt = null;
                 return true;

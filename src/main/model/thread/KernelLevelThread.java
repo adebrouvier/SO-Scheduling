@@ -19,7 +19,13 @@ public class KernelLevelThread extends Thread {
         super(parentPID, null, "KLT"); // le paso null porque no existen los KLT puros
         this.threads = threads;
         this.threadLibraryType = threadLibraryType;
-        this.algorithm = new FIFO(); //Hacer un switch
+        switch (threadLibraryType) {
+            case FIFO:
+                algorithm = new FIFO();
+                break;
+            case RR:
+                algorithm = new RR(4); // TODO FIX HARDCODEO
+        }
         readyThreads = new LinkedList<>();
     }
 
