@@ -1,5 +1,6 @@
 package main.model.thread;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -22,37 +23,64 @@ public class KernelLevelThread extends Thread {
         readyThreads = new LinkedList<>();
     }
 
+    /**
+     * @param core
+     * @return true if this thread is finished or blocked
+     */
     public boolean executeCPU(int core) {
-        TNode tempNode;
+//        TNode tempNode;
+//
+        runningThread = algorithm.execute(readyThreads, runningThread, core);
 
-        if(blockedThread == null) {
-
-            tempNode = algorithm.execute(readyThreads, runningThread, core);
-
-            if(tempNode.getRunning() == null){
-                runningThread = null;
-                UserLevelThread blocked = tempNode.getBlocked();
-                if(blocked == null) { //FINISHED
-                    //Logica de cuando un ult termina
-                    if (isFinished()) {
-                        setState(ThreadState.FINISHED);
-                    } else {
-                        runningThread = null;
-                        setState(ThreadState.READY);
-                    }
-                }else{ //BLOCKED
-                    blockedThread = blocked;
+        if (runningThread != null) {
+            switch (runningThread.getState()) {
+                case READY:
+                case RUNNING:
+                    return false;
+                case BLOCKED:
                     setState(ThreadState.BLOCKED);
-                }
-                return true;
-            }else{
-                runningThread = tempNode.getRunning();
-                setState(ThreadState.RUNNING);
-                return false;
+                    blockedThread = runningThread;
+                    runningThread = null;
+                    return true;
+                case FINISHED:
+                    runningThread.setState(ThreadState.FINISHED);
+                    runningThread = null;
+                    if (isFinished()) {
+                        blockedThread = null; // no hace falta
+                        setState(ThreadState.FINISHED);
+                        return true;
+                    }
+                    break;
             }
         }
-        return false; //Ver bien esto
+
+        return false;
     }
+
+//            if(tempNode.getRunning() == null) {
+//                UserLevelThread blocked = tempNode.getBlocked();
+//                if(blocked == null) { //FINISHED
+//                    //Logica de cuando un ult termina
+//                    runningThread.setState(ThreadState.FINISHED);
+//                    if (isFinished()) {
+//                        setState(ThreadState.FINISHED);
+//                    } else {
+//                        runningThread = null;
+//                        setState(ThreadState.READY);
+//                    }
+//                }else{ //BLOCKED
+//                    blockedThread = blocked;
+//                    setState(ThreadState.BLOCKED);
+//                }
+//                runningThread = null;
+//                return true;
+//            }else{
+//                runningThread = tempNode.getRunning();
+//                setState(ThreadState.RUNNING);
+//                return false;
+//            }
+//        }
+//        return false; //Ver bien esto
 
     private UserLevelThread unblockedThread = null;
 
@@ -68,17 +96,21 @@ public class KernelLevelThread extends Thread {
 //    }
 
     public boolean executeIO(int device) {
-
+        unblockedThread = null;
         if(blockedThread.execute(device)) {
-            setState(ThreadState.READY);
-            if (!readyThreads.contains(blockedThread))
-                readyThreads.add(blockedThread);
-            //unblockedThread = blockedThread;
+//            setState(ThreadState.READY);
+//            if (!readyThreads.contains(blockedThread))
+//                readyThreads.add(blockedThread);
+            unblockedThread = blockedThread;
             blockedThread = null;
             return true;
-        } else {
-            return false;
         }
+
+        return false;
+    }
+
+    public UserLevelThread getUnblockedThread(){
+        return unblockedThread;
     }
 
 
@@ -86,8 +118,14 @@ public class KernelLevelThread extends Thread {
         return runningThread;
     }
 
-    public Queue<UserLevelThread> getReadyThreads() {
-        return readyThreads;
+    public void addReady(UserLevelThread ult) {
+        if (!readyThreads.contains(ult)) {
+            readyThreads.add(ult);
+        }
+    }
+
+    public List<UserLevelThread> getReadyThreads() {
+        return new ArrayList<>(readyThreads);
     }
 
     public List<UserLevelThread> getThreads (){

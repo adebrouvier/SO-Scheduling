@@ -51,8 +51,8 @@ public abstract class Scheduler {
      * @param processes new processes created in this instant of time
      * @param threads new threads created in this instant of time
      */
-    public boolean execute(Collection<Process> processes, Collection<? extends Thread> threads) {
-        resetULTs(threads);
+    public boolean execute(Collection<Process> processes, Collection<? extends Thread> threads, int time) {
+        resetULTs(threads, time);
 
         runIO();                    // ejecuto io
 
@@ -65,17 +65,22 @@ public abstract class Scheduler {
         return false;
     }
 
-    private void resetULTs(Collection<? extends Thread> threads) {
+    private void resetULTs(Collection<? extends Thread> threads, int time) {
+        int aux;
         if (threads != null) {
             for (Thread thread : threads) {
-                thread.addInstant();
+                aux = time;
+                while (aux-- > 0)
+                    thread.addInstant();
             }
         }
 
         for (Process process : getProcesses()) {
             for (KernelLevelThread klt : process.getThreads()) {
                 for (UserLevelThread ult : klt.getThreads()) {
-                    ult.addInstant();
+                    if (ult.getState() != ThreadState.NEW) {
+                        ult.addInstant();
+                    }
                 }
             }
         }
@@ -86,9 +91,15 @@ public abstract class Scheduler {
         for (IO io : IODevices) {
             // agrego el proceso desbloqueado de nuevo a la ready queue
             KernelLevelThread klt = io.getReady();
+            UserLevelThread ult;
 
             if (klt != null) {
+                ult = klt.getUnblockedThread();
+                // no deberia ser null
+                ult.setState(ThreadState.READY);
                 klt.setState(ThreadState.READY);
+                klt.addReady(ult);
+
                 Process process = processes.get(klt.getParentPID());
                 process.setState(ProcessState.READY);
                 process.addReady(klt);
@@ -137,12 +148,12 @@ public abstract class Scheduler {
             thread.setState(ThreadState.READY);
             Process parent = processes.get(thread.getParentPID());
             KernelLevelThread klt = parent.getThread(((UserLevelThread)thread).getParentKltID());
-            klt.getReadyThreads().add((UserLevelThread) thread);
+            klt.addReady((UserLevelThread) thread);
             parent.addReady(klt);
 
-            if (parent.getState().equals(ProcessState.SLEEP)) {
-                  readyQueue.add(parent);
-            }
+//            if (parent.getState().equals(ProcessState.SLEEP)) {
+//                  readyQueue.add(parent);
+//            }
         }
     }
 

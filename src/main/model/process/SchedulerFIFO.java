@@ -18,6 +18,10 @@ public class SchedulerFIFO extends Scheduler {
 
         for (Core core : cores) {
 
+            if (core.getCurrentKLT() != null) {
+                System.out.println("KLT ID: " + core.getCurrentKLT().getTID());
+            }
+
             if (!core.isRunning()) {
                 Process p = readyQueue.peek(); // puede haber mas de un klt del mismo proceso en distintos cores
                 if (p == null) {
@@ -47,15 +51,14 @@ public class SchedulerFIFO extends Scheduler {
                 } else if (state == ThreadState.FINISHED) {
                     if (process.isFinished()) {
                         process.setState(ProcessState.FINISHED);
-                        readyQueue.poll();
-                        return;
                     }
                 }
             }
 
             //el thread sigue corriendo
             if (!process.hasAvailableKLT()) { //Checkea que si al proceso le queda algo para correr.
-                readyQueue.poll();
+                readyQueue.remove(process);
+                //readyQueue.poll();
             }
 
         }

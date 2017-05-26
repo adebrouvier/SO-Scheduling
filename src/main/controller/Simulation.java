@@ -53,8 +53,8 @@ public class Simulation {
             // TODO check input (pause, resume, etc)
 
             if (running) {
-                scheduler.execute(processes.get(time), threads.get(time));
-                gantt.addTraceNode(scheduler);
+                scheduler.execute(processes.get(time), threads.get(time), time);
+                gantt.addTraceNode(scheduler, time);
                 gantt.print(time);
                 time++;
 

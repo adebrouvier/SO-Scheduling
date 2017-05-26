@@ -1,6 +1,7 @@
 package main.model.process;
 
 import main.model.thread.KernelLevelThread;
+import main.model.thread.ThreadState;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -50,11 +51,19 @@ public class Process {
     }
 
     public boolean isFinished() {
-        return !hasAvailableKLT();
+        for (KernelLevelThread klt: threads) {
+            if (klt.getState() != ThreadState.FINISHED)
+                return false;
+        }
+        return true;
     }
 
     public KernelLevelThread getNextKLT() {
-        return readyThreads.poll();
+        for (KernelLevelThread klt : threads) {
+            if (klt.getState() == ThreadState.READY)
+                return klt;
+        }
+        return null;
     }
 
     public List<KernelLevelThread> getThreads() {
@@ -63,7 +72,7 @@ public class Process {
 
     public boolean hasAvailableKLT() {
         for (KernelLevelThread klt : threads) {
-            if (!klt.isFinished()) {
+            if (!klt.isFinished() && klt.getState() == ThreadState.READY) {
                 return true;
             }
         }
@@ -108,16 +117,25 @@ public class Process {
     }
 
     public void setBlockedThread(KernelLevelThread blocked) {
+        blocked.setState(ThreadState.BLOCKED);
         this.blockedThread = blocked;
     }
 
     public void addReady(KernelLevelThread klt) {
-        if (!readyThreads.contains(klt)) {
-            readyThreads.add(klt);
-        }
+        klt.setState(ThreadState.READY);
+//        if (!readyThreads.contains(klt)) {
+//            readyThreads.add(klt);
+//        }
     }
 
-    public Queue<KernelLevelThread> getReadyThreads() {
-        return readyThreads;
+    public List<KernelLevelThread> getReadyThreads() {
+        List<KernelLevelThread> ready = new ArrayList<>();
+
+        for (KernelLevelThread klt : threads) {
+            if (klt.getState() == ThreadState.READY)
+                ready.add(klt);
+        }
+
+        return ready;
     }
 }

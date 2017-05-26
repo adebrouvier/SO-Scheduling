@@ -26,12 +26,12 @@ public class Gantt {
      * Adds a new column to the Gantt diagram
      * @param scheduler
      */
-    public void addTraceNode(Scheduler scheduler) {
+    public void addTraceNode(Scheduler scheduler, int time) {
         // TODO crear un TraceNode a partir de lo que tiene el scheduler en ese instante
         TraceNode node = new TraceNode();
 
         ///TODO remove///
-        print(scheduler);
+        print(scheduler, time);
         /////////////////
 
         trace.add(node);
@@ -54,9 +54,8 @@ public class Gantt {
     }
 
     // imprime una columna (un instante de tiempo)
-    private void print(Scheduler scheduler) {
+    private void print(Scheduler scheduler, int time) {
         int pid, kid, uid;
-        int lenght = 0;
 
         for (Process process : scheduler.getProcesses()) {
             for (KernelLevelThread klt : process.getThreads()) {
@@ -67,7 +66,8 @@ public class Gantt {
                     System.out.print("P" + pid + "K" + kid + "U" + uid + " | ");
 
                     List<Integer> trace = ult.getTrace();
-                    lenght = trace.size();
+
+                   // System.out.println("TRACE SIZE: " + trace.size());
 
                     for (Integer instant : trace) {
                         if (instant == 0) {
@@ -85,7 +85,7 @@ public class Gantt {
         }
 
         System.out.print("       |");
-        for (int i = 0; i < lenght; i++) {
+        for (int i = 1; i <= time; i++) {
             System.out.print("   " + i + "  |");
         }
         System.out.println();
@@ -94,9 +94,6 @@ public class Gantt {
 
         System.out.println("READY THREADS:");
         for (Process process : readyQueue) {
-            if (readyQueue.size() > 1){
-                System.out.println("Mas de 1");
-            }
             for (KernelLevelThread klt : process.getReadyThreads()) {
                 for (UserLevelThread ult : klt.getReadyThreads()) {
                     System.out.println("P" + process.getPID() + "K" + klt.getTID() + "U" + ult.getTID());
@@ -122,11 +119,11 @@ public class Gantt {
         }
 
         for (Process process : scheduler.getProcesses()) {
-            System.out.println("ESTADO DEL PROCESO: " + process.getState());
+            System.out.println("P" + process.getPID() + ": " + process.getState());
             for (KernelLevelThread k : process.getThreads()){
-                System.out.println("ESTADO DEL KLT: " + k.getState());
+                System.out.println("K" + k.getTID() + ": " + k.getState());
                 for (UserLevelThread u : k.getThreads()){
-                    System.out.println("K" + k.getTID() + "U" + u.getTID() + ": " + u.getState());
+                    System.out.println("U" + u.getTID() + ": " + u.getState());
                 }
             }
         }
