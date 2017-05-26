@@ -19,14 +19,16 @@ public class SchedulerFIFO extends Scheduler {
         for (Core core : cores) {
 
             if (!core.isRunning()) {
-
                 Process p = readyQueue.peek(); // puede haber mas de un klt del mismo proceso en distintos cores
                 if (p == null) {
+                    System.out.println("CORRE EL SO -----------------------------------");
                     //TODO Corre el SO
                     continue;
                 }
-                KernelLevelThread klt = p.getCurrentKLT(); //TODO este metodo hace la merca (elige el klt segun nuestra logica merca dentro del proceso merca dentro del proceso merca)
+                KernelLevelThread klt = p.getNextKLT();
                 core.setCurrentKLT(klt);
+                klt.setState(ThreadState.RUNNING);
+                p.setState(ProcessState.RUNNING);
             }
 
             KernelLevelThread klt = core.getCurrentKLT();
@@ -35,23 +37,24 @@ public class SchedulerFIFO extends Scheduler {
             if (klt.executeCPU(core.getID())) { // se bloqueo o termino el thread
                 ThreadState state = klt.getState();
                 core.setCurrentKLT(null);
+
                 if (state == ThreadState.BLOCKED) {
                     IO io = IODevices.get(klt.getBlocked().getCurrentBurst().getType() - 1);
                     io.add(klt);
 
-                    process.setBlocked(klt);
+                    process.setBlockedThread(klt);
                     process.setState(ProcessState.BLOCKED);
-                    blockedQueue.add(process);
                 } else if (state == ThreadState.FINISHED) {
-                    // if (todos los klt del proceso estan finished)
                     if (process.isFinished()) {
                         process.setState(ProcessState.FINISHED);
+                        readyQueue.poll();
+                        return;
                     }
                 }
             }
-            //el thread sigue corriendo
 
-            if (!process.hasAvailableKLT()) {//Checkea que si al proceso le queda algo para correr.
+            //el thread sigue corriendo
+            if (!process.hasAvailableKLT()) { //Checkea que si al proceso le queda algo para correr.
                 readyQueue.poll();
             }
 

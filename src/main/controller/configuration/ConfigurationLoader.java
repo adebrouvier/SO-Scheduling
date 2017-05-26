@@ -6,7 +6,6 @@ import main.model.thread.KernelLevelThread;
 import main.model.thread.ThreadLibraryType;
 import main.model.thread.UserLevelThread;
 import org.apache.commons.cli.*;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.io.File;
 import java.util.*;
@@ -31,7 +30,7 @@ public class ConfigurationLoader {
         Options options = new Options();
 
         // add option
-        String[] optionList = {"file","p","b","c","ps","tl","io"};
+        String[] optionList = {"f","p","b","c","ps","tl","io"};
         //String[] longOption = {"processes","bursts","cores","scheduling","threadlibrary","iodevices"};
         String[] optionDescriptions = {"filename of input","number of processes","number of bursts",
                 "number of cores","type of process scheduling","thread library algorithm","number of io devices"};

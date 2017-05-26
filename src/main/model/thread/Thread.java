@@ -34,6 +34,7 @@ public abstract class Thread {
         this.parentPID = parentPID;
         this.bursts = burstList;
         trace = new ArrayList<>();
+        setState(ThreadState.NEW);
     }
 
     /**
@@ -46,7 +47,7 @@ public abstract class Thread {
 
         boolean burstFinished = bursts.get(currentBurstIndex).execute(instant);
 
-        if (burstFinished){
+        if (burstFinished) {
             int burstType = bursts.get(currentBurstIndex).getType();
             if(burstType == 0) {
                 state = ThreadState.BLOCKED;
@@ -72,7 +73,7 @@ public abstract class Thread {
     }
 
     public void setState(ThreadState state){
-        this.state=state;
+        this.state = state;
     }
 
     public int getTID() {
@@ -112,6 +113,6 @@ public abstract class Thread {
 
     @Override
     public String toString() {
-        return getClass().equals(KernelLevelThread.class) ? "K" : "U"  + TID;
+        return getClass().equals(KernelLevelThread.class) ? "K" + TID : "U"  + TID;
     }
 }

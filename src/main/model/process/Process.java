@@ -50,16 +50,10 @@ public class Process {
     }
 
     public boolean isFinished() {
-        boolean finished = threads.size() == finishedThreads.size();
-        if (finished) {
-            setState(ProcessState.FINISHED);
-        }
-        return finished;
+        return !hasAvailableKLT();
     }
 
-
-    // TODO LOGICA MERCA OP
-    public KernelLevelThread getCurrentKLT() {
+    public KernelLevelThread getNextKLT() {
         return readyThreads.poll();
     }
 
@@ -68,7 +62,12 @@ public class Process {
     }
 
     public boolean hasAvailableKLT() {
-        return !readyThreads.isEmpty();
+        for (KernelLevelThread klt : threads) {
+            if (!klt.isFinished()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -104,19 +103,21 @@ public class Process {
         return null;
     }
 
-    public void setBlocked(KernelLevelThread blocked) {
+    public KernelLevelThread getBlockedThread() {
+        return blockedThread;
+    }
+
+    public void setBlockedThread(KernelLevelThread blocked) {
         this.blockedThread = blocked;
     }
 
     public void addReady(KernelLevelThread klt) {
-        readyThreads.add(klt);
+        if (!readyThreads.contains(klt)) {
+            readyThreads.add(klt);
+        }
     }
 
     public Queue<KernelLevelThread> getReadyThreads() {
         return readyThreads;
-    }
-
-    public KernelLevelThread getBlockedThread() {
-        return blockedThread;
     }
 }

@@ -16,7 +16,7 @@ import java.util.Map;
 public class Main {
 
     public static void main(String[] args) {
-        //ConfigurationLoader cl = new ConfigurationLoader(args);
+        ConfigurationLoader cl = new ConfigurationLoader(args);
         //Configuration cfg = cl.load();
 
         Map<Integer, List<Process>> processMap = new HashMap<>(); // mapa global de procesos
@@ -42,6 +42,8 @@ public class Main {
         burst = new Burst(0, 5);
         bursts.add(burst);
 
+
+
         ult = new UserLevelThread(1, 1, bursts);
         ults.add(ult);
         ultList.add(ult);
@@ -53,8 +55,9 @@ public class Main {
         bursts.add(burst);
         burst = new Burst(1, 3);
         bursts.add(burst);
-        burst = new Burst(0, 3);
+        burst = new Burst(0, 2);
         bursts.add(burst);
+
 
         ult = new UserLevelThread(1, 1, bursts);
         ults.add(ult);

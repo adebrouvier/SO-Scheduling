@@ -1,10 +1,10 @@
 package main.model;
 
+import main.model.process.Process;
 import main.model.thread.KernelLevelThread;
 import main.model.thread.ThreadState;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 /**
  */
@@ -20,7 +20,8 @@ public class IO {
         blockedKlts = new LinkedList<>();
     }
 
-    public void execute() {
+    public boolean execute() {
+        readyKlt = null;
 
         if (!isBusy()) {
             currentKlt = blockedKlts.poll();
@@ -33,9 +34,10 @@ public class IO {
                 //TODO aca hay que actualizar las listas de ready en process
                 readyKlt = currentKlt;
                 currentKlt = null;
+                return true;
             }
         }
-
+        return false;
     }
 
     public boolean isBusy(){
@@ -47,7 +49,7 @@ public class IO {
      * @return el KLT si se desbloqueó
      */
     public KernelLevelThread getReady() {
-        return readyKlt;
+        return  readyKlt;
     }
 
     public KernelLevelThread getCurrentKlt() {
@@ -60,5 +62,13 @@ public class IO {
 
     public int getID() {
         return ID;
+    }
+
+    public List<KernelLevelThread> getBlockedThreads() {
+        List<KernelLevelThread> klts = new ArrayList<>(blockedKlts);
+        if (currentKlt != null) {
+            klts.add(currentKlt);
+        }
+        return klts;
     }
 }

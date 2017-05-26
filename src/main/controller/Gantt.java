@@ -8,6 +8,7 @@ import main.model.thread.UserLevelThread;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 
 public class Gantt {
 
@@ -55,7 +56,7 @@ public class Gantt {
     // imprime una columna (un instante de tiempo)
     private void print(Scheduler scheduler) {
         int pid, kid, uid;
-
+        int lenght = 0;
 
         for (Process process : scheduler.getProcesses()) {
             for (KernelLevelThread klt : process.getThreads()) {
@@ -66,6 +67,7 @@ public class Gantt {
                     System.out.print("P" + pid + "K" + kid + "U" + uid + " | ");
 
                     List<Integer> trace = ult.getTrace();
+                    lenght = trace.size();
 
                     for (Integer instant : trace) {
                         if (instant == 0) {
@@ -79,38 +81,57 @@ public class Gantt {
                     }
                     System.out.println();
                 }
-                System.out.println();
             }
         }
+
+        System.out.print("       |");
+        for (int i = 0; i < lenght; i++) {
+            System.out.print("   " + i + "  |");
+        }
+        System.out.println();
 
         Queue<Process> readyQueue = scheduler.getReadyQueue();
 
         System.out.println("READY THREADS:");
-        System.out.println(readyQueue);
-        /*for (Process process : readyQueue) {
+        for (Process process : readyQueue) {
+            if (readyQueue.size() > 1){
+                System.out.println("Mas de 1");
+            }
             for (KernelLevelThread klt : process.getReadyThreads()) {
                 for (UserLevelThread ult : klt.getReadyThreads()) {
                     System.out.println("P" + process.getPID() + "K" + klt.getTID() + "U" + ult.getTID());
                 }
             }
-        }*/
+        }
         System.out.println();
 
 
-        Queue<Process> blockedQueue = scheduler.getBlockedQueue();
 
 //        System.out.println("RUNNING THREADS");
-        KernelLevelThread klt;
 //        for (Process process : blockedQueue) {
 //            klt = process.getBlockedThread();
 //            System.out.print("P" + process.getPID() + "K" + klt.getTID() + "U" + klt.getBlocked());
 //        }
 
+        Set<KernelLevelThread> blockedThreads = scheduler.getBlockedThreads();
+
         System.out.println("BLOCKED THREADS:");
-        for (Process process : blockedQueue) {
-            klt = process.getBlockedThread();
-            System.out.println("P" + process.getPID() + "K" + klt.getTID() + "U" + klt.getBlocked());
+        for (KernelLevelThread klt : blockedThreads) {
+            System.out.println("P" + klt.getParentPID() + "K" + klt.getTID() + "U" + klt.getBlocked().getTID());
+
         }
+
+        for (Process process : scheduler.getProcesses()) {
+            System.out.println("ESTADO DEL PROCESO: " + process.getState());
+            for (KernelLevelThread k : process.getThreads()){
+                System.out.println("ESTADO DEL KLT: " + k.getState());
+                for (UserLevelThread u : k.getThreads()){
+                    System.out.println("K" + k.getTID() + "U" + u.getTID() + ": " + u.getState());
+                }
+            }
+        }
+
+        System.out.println();
     }
 
 

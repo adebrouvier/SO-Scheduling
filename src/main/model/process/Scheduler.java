@@ -88,17 +88,20 @@ public abstract class Scheduler {
             KernelLevelThread klt = io.getReady();
 
             if (klt != null) {
+                klt.setState(ThreadState.READY);
                 Process process = processes.get(klt.getParentPID());
                 process.setState(ProcessState.READY);
-                klt.setState(ThreadState.READY);
                 process.addReady(klt);
 
-                if (process != null) {
+                if (!readyQueue.contains(process)) {
                     readyQueue.add(process);
                 }
             }
 
-            io.execute();
+            if (io.execute()) { // se termino la burst de io
+//                Process process = processes.get(klt.getParentPID());
+//                process.setBlockedThread(null);
+            }
         }
     }
 
@@ -134,7 +137,7 @@ public abstract class Scheduler {
             thread.setState(ThreadState.READY);
             Process parent = processes.get(thread.getParentPID());
             KernelLevelThread klt = parent.getThread(((UserLevelThread)thread).getParentKltID());
-            parent.getThread(klt.getTID()).getReadyThreads().add((UserLevelThread) thread);
+            klt.getReadyThreads().add((UserLevelThread) thread);
             parent.addReady(klt);
 
             if (parent.getState().equals(ProcessState.SLEEP)) {
@@ -161,7 +164,13 @@ public abstract class Scheduler {
         return readyQueue;
     }
 
-    public Queue<Process> getBlockedQueue() {
-        return blockedQueue;
+    public Set<KernelLevelThread> getBlockedThreads() {
+        Set<KernelLevelThread> blockedThreads = new HashSet<>();
+
+        for (IO io : IODevices){
+            blockedThreads.addAll(io.getBlockedThreads());
+        }
+
+        return blockedThreads;
     }
 }
