@@ -15,7 +15,7 @@ public class RR implements Algorithm {
     }
 
     @Override
-    public TNode execute(Queue<UserLevelThread> queue, UserLevelThread runningUlt) {
+    public TNode execute(Queue<UserLevelThread> queue, UserLevelThread runningUlt, int core) {
         TNode returnNode;
         if(runningUlt == null){
             if(!queue.isEmpty()){
@@ -23,7 +23,7 @@ public class RR implements Algorithm {
             }
 
         }
-            if(runningUlt.execute()) {
+            if(runningUlt.execute(core * (-1))) {
                 if (runningUlt.getState() == ThreadState.BLOCKED) {
                     returnNode = new TNode(null, runningUlt);
                 } else{

@@ -1,17 +1,12 @@
 package main.controller;
 
-import main.model.Burst;
-import main.model.Core;
-import main.model.IO;
 import main.model.process.Process;
 import main.model.process.Scheduler;
 import main.model.thread.KernelLevelThread;
 import main.model.thread.UserLevelThread;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Gantt {
 
@@ -58,46 +53,32 @@ public class Gantt {
 
     // imprime una columna (un instante de tiempo)
     private void print(Scheduler scheduler) {
-        Map<Core, Integer> runningThreads = new HashMap<>(); // Core -> running ult id
+        int pid, kid, uid;
 
-        for (Core core : scheduler.getCores()) {
-            runningThreads.put(core, core.getCurrentKLT().getRunningThread().getTID());
-        }
 
-        int pid, kid, uid, burstType;
-        Burst currentBurst;
         for (Process process : scheduler.getProcesses()) {
             for (KernelLevelThread klt : process.getThreads()) {
-                for (UserLevelThread ult : klt.getReadyThreads()) {
+                for (UserLevelThread ult : klt.getThreads()) {
                     uid = ult.getTID();
                     kid = klt.getTID(); // same as ult.getParentKltID();
                     pid = process.getPID(); // same as ult.getParentPID() o klt.getParentPID();
                     System.out.print("P" + pid + "K" + kid + "U" + uid + " | ");
 
-                    currentBurst = ult.getCurrentBurst();
-                    if (currentBurst == null) {
-                        //finished
-                    }
+                    List<Integer> trace = ult.getTrace();
 
-                    burstType = ult.getCurrentBurst().getType();
-                    if (burstType == 0) { // CPU burst
-                        for (Core core : scheduler.getCores()) {
-                            if (uid == core.getCurrentKLT().getRunningThread().getTID()) {
-                                System.out.print("CPU" + core.getID());
-                            } else {
-                                System.out.print("    ");
-                            }
+                    for (Integer instant : trace) {
+                        if (instant == 0) {
+                            System.out.print("    ");
+                        } else if (instant < 0) {
+                            System.out.print("CPU" + instant * (-1) );
+                        } else {
+                            System.out.print("I/O" + instant);
                         }
-                    } else { // I/O burst
-                        for (IO io : scheduler.getIODevices()) {
-                            if (uid == io.getCurrentKlt().getRunningThread().getTID()) {
-                                System.out.print("I/O" + io.getID());
-                            } else {
-                                System.out.print("    ");
-                            }
-                        }
+                        System.out.print(" | ");
                     }
+                    System.out.println();
                 }
+                System.out.println();
             }
         }
     }

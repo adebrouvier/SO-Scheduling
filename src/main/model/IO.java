@@ -27,12 +27,11 @@ public class IO {
         }
 
         if (isBusy()) {
-            if (currentKlt.execute()) {
+            if (currentKlt.executeIO(ID)) {
                 // los threads siempre terminan con burst de cpu entonces
                 // no es necesario checkear si el thread esta terminado
                 //TODO aca hay que actualizar las listas de ready en process
                 readyKlt = currentKlt;
-                readyKlt.setState(ThreadState.READY);
                 currentKlt = null;
             }
         }

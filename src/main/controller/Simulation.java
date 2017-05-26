@@ -1,6 +1,7 @@
 package main.controller;
 
 import main.controller.configuration.Configuration;
+import main.model.Core;
 import main.model.process.Process;
 import main.model.process.Scheduler;
 import main.model.process.SchedulerFIFO;
@@ -9,6 +10,7 @@ import main.model.thread.UserLevelThread;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class Simulation {
 
@@ -37,6 +39,8 @@ public class Simulation {
         processes = cfg.getProcesses();
         threads = cfg.getThreads();
         time = 0;
+
+        gantt = new Gantt();
     }
 
 
@@ -50,13 +54,13 @@ public class Simulation {
 
             if (running) {
                 scheduler.execute(processes.get(time), threads.get(time));
-
                 gantt.addTraceNode(scheduler);
                 gantt.print(time);
                 time++;
 
                 try {
-                    System.out.wait(1);
+                    //System.out.wait(1000);
+                    TimeUnit.SECONDS.sleep(1);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

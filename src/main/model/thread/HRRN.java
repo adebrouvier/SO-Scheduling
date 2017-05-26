@@ -6,7 +6,7 @@ import java.util.Queue;
 public class HRRN implements Algorithm {
     //No nos faltaria agregar una variable de tiempo de espera?
     @Override
-    public TNode execute(Queue<UserLevelThread> ults, UserLevelThread runningUlt) {
+    public TNode execute(Queue<UserLevelThread> ults, UserLevelThread runningUlt, int core) {
         return null;
     }
 }

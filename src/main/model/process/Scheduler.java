@@ -34,7 +34,7 @@ public abstract class Scheduler {
         this.cores = new ArrayList<>();
 
         for (int i = 0 ; i < coreCount ; i++){
-            cores.add(new Core(i));
+            cores.add(new Core(i + 1));
         }
     }
 
@@ -42,7 +42,7 @@ public abstract class Scheduler {
         IODevices = new ArrayList<>();
 
         for (int i = 0; i < ioCount; i++) {
-            IODevices.add(new IO(i));
+            IODevices.add(new IO(i + 1));
         }
     }
 
@@ -52,6 +52,8 @@ public abstract class Scheduler {
      * @param threads new threads created in this instant of time
      */
     public boolean execute(Collection<Process> processes, Collection<? extends Thread> threads) {
+        resetULTs(threads);
+
         runIO();                    // ejecuto io
 
         addProcesses(processes);    // agrego los procesos nuevos si los hubiere
@@ -63,6 +65,22 @@ public abstract class Scheduler {
         return false;
     }
 
+    private void resetULTs(Collection<? extends Thread> threads) {
+        if (threads != null) {
+            for (Thread thread : threads) {
+                thread.addInstant();
+            }
+        }
+
+        for (Process process : getProcesses()) {
+            for (KernelLevelThread klt : process.getThreads()) {
+                for (UserLevelThread ult : klt.getThreads()) {
+                    ult.addInstant();
+                }
+            }
+        }
+    }
+
     public void runIO() {
 
         for (IO io : IODevices) {
@@ -72,6 +90,7 @@ public abstract class Scheduler {
             if (klt != null) {
                 Process process = processes.get(klt.getParentPID());
                 process.setState(ProcessState.READY);
+                klt.setState(ThreadState.READY);
                 process.addReady(klt);
 
                 if (process != null) {
@@ -90,6 +109,10 @@ public abstract class Scheduler {
      * @param processes
      */
     private void addProcesses(Collection<Process> processes) {
+        if (processes == null) {
+            return;
+        }
+
         for (Process process : processes) {
             process.setState(ProcessState.READY);
             this.processes.put(process.getPID(), process);
@@ -103,10 +126,16 @@ public abstract class Scheduler {
      * @param threads
      */
     private void addThreads(Collection<? extends Thread> threads) {
+        if (threads == null) {
+            return;
+        }
+
         for (Thread thread : threads) {
             thread.setState(ThreadState.READY);
             Process parent = processes.get(thread.getParentPID());
-            parent.getThread(((UserLevelThread)thread).getParentKltID()).getReadyThreads().add((UserLevelThread) thread);
+            KernelLevelThread klt = parent.getThread(((UserLevelThread)thread).getParentKltID());
+            parent.getThread(klt.getTID()).getReadyThreads().add((UserLevelThread) thread);
+            parent.addReady(klt);
 
             if (parent.getState().equals(ProcessState.SLEEP)) {
                   readyQueue.add(parent);
