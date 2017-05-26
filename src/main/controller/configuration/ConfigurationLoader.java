@@ -167,9 +167,9 @@ public class ConfigurationLoader {
 
                 String[] tokens = identifier.split("_");
 
-                int processNumber = Integer.valueOf(tokens[0].substring(1)) - 1;
-                int kernelThreadNumber = Integer.valueOf(tokens[1].substring(1)) - 1;
-                int userThreadNumber = Integer.valueOf(tokens[2].substring(1)) - 1;
+                int processNumber = Integer.valueOf(tokens[0].substring(1));
+                int kernelThreadNumber = Integer.valueOf(tokens[1].substring(1));
+                int userThreadNumber = Integer.valueOf(tokens[2].substring(1));
 
                 if (m1.matches()) {
 
@@ -260,6 +260,34 @@ public class ConfigurationLoader {
                     ultArrivals.put(arrivalTime,arrivalList);
                 }
             }
+        }
+
+        for (Process p : process){
+
+            int minTime = Integer.MAX_VALUE;
+
+            for (KernelLevelThread k : p.getThreads()){
+
+                for (UserLevelThread u : k.getThreads()){
+
+                    Integer arrivalTime = ultArrivalTimes.get(u.getTID());
+
+                    if (arrivalTime < minTime) {
+                        minTime = arrivalTime;
+                    }
+                }
+            }
+
+            List<Process> arrivalList = processArrivals.get(minTime);
+
+            if (arrivalList == null){
+                arrivalList = new ArrayList<>();
+            }
+
+            arrivalList.add(p);
+
+            processArrivals.put(minTime,arrivalList);
+
         }
 
 
