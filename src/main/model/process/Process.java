@@ -111,4 +111,12 @@ public class Process {
     public void addReady(KernelLevelThread klt) {
         readyThreads.add(klt);
     }
+
+    public Queue<KernelLevelThread> getReadyThreads() {
+        return readyThreads;
+    }
+
+    public KernelLevelThread getBlockedThread() {
+        return blockedThread;
+    }
 }

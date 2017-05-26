@@ -156,4 +156,12 @@ public abstract class Scheduler {
     public List<IO> getIODevices() {
         return IODevices;
     }
+
+    public Queue<Process> getReadyQueue() {
+        return readyQueue;
+    }
+
+    public Queue<Process> getBlockedQueue() {
+        return blockedQueue;
+    }
 }

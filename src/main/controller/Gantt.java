@@ -7,6 +7,7 @@ import main.model.thread.UserLevelThread;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 public class Gantt {
 
@@ -80,6 +81,35 @@ public class Gantt {
                 }
                 System.out.println();
             }
+        }
+
+        Queue<Process> readyQueue = scheduler.getReadyQueue();
+
+        System.out.println("READY THREADS:");
+        System.out.println(readyQueue);
+        /*for (Process process : readyQueue) {
+            for (KernelLevelThread klt : process.getReadyThreads()) {
+                for (UserLevelThread ult : klt.getReadyThreads()) {
+                    System.out.println("P" + process.getPID() + "K" + klt.getTID() + "U" + ult.getTID());
+                }
+            }
+        }*/
+        System.out.println();
+
+
+        Queue<Process> blockedQueue = scheduler.getBlockedQueue();
+
+//        System.out.println("RUNNING THREADS");
+        KernelLevelThread klt;
+//        for (Process process : blockedQueue) {
+//            klt = process.getBlockedThread();
+//            System.out.print("P" + process.getPID() + "K" + klt.getTID() + "U" + klt.getBlocked());
+//        }
+
+        System.out.println("BLOCKED THREADS:");
+        for (Process process : blockedQueue) {
+            klt = process.getBlockedThread();
+            System.out.println("P" + process.getPID() + "K" + klt.getTID() + "U" + klt.getBlocked());
         }
     }
 
