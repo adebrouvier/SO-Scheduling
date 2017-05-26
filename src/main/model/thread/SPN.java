@@ -5,7 +5,7 @@ import java.util.Queue;
 
 public class SPN implements Algorithm {
     @Override
-    public TNode execute(Queue<UserLevelThread> ults, UserLevelThread runningUlt) {
+    public TNode execute(Queue<UserLevelThread> ults, UserLevelThread runningUlt, int core) {
         TNode returnNode;
         if(runningUlt == null) {
             UserLevelThread shortest = ults.peek();
@@ -17,7 +17,7 @@ public class SPN implements Algorithm {
                 runningUlt = shortest;
             }
         }
-            if(runningUlt.execute()) {
+            if(runningUlt.execute(core * (-1))) {
                 if (runningUlt.getState() == ThreadState.BLOCKED) {
                     returnNode = new TNode(null, runningUlt);
                 } else {

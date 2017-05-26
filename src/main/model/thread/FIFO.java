@@ -10,7 +10,7 @@ public class FIFO implements Algorithm{
     }
 
     @Override
-    public TNode execute(Queue<UserLevelThread> queue, UserLevelThread runningUlt) {
+    public TNode execute(Queue<UserLevelThread> queue, UserLevelThread runningUlt, int core) {
         //Que esto funcione, depende de como pongamos los ults en la lista. Ver como laburamos con arrival time y "desbloquear" threads
         TNode returnNode;
         if(runningUlt == null) {
@@ -18,15 +18,17 @@ public class FIFO implements Algorithm{
                 runningUlt = queue.poll();
             }
         }
+        if (runningUlt != null) {
             //Esto se repite bastante, se podria hacer una funcion.
-            if(runningUlt.execute()){
-                if(runningUlt.getState() == ThreadState.BLOCKED){
+            if (runningUlt.execute(core * (-1))) {
+                if (runningUlt.getState() == ThreadState.BLOCKED) {
                     returnNode = new TNode(null, runningUlt);
-                }else{
+                } else {
                     returnNode = new TNode(null, null);
                 }
                 return returnNode;
             }
+        }
         returnNode = new TNode(runningUlt, null);
         return returnNode;
     }

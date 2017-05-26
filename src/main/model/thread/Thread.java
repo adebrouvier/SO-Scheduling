@@ -2,6 +2,7 @@ package main.model.thread;
 
 import main.model.Burst;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Thread {
@@ -17,23 +18,33 @@ public abstract class Thread {
     private static int KLTCount;
     private static int ULTCount;
 
-    public Thread(int parentPID, List<Burst> burstList) {
-        if (this.getClass().equals(UserLevelThread.class)) {
+    /**
+     * <0 = cpu -n
+     * 0 = no corrio
+     * >0 = io n
+     */
+    private List<Integer> trace;
+
+    public Thread(int parentPID, List<Burst> burstList, String type) {
+        if (type == "ULT") {
             TID = ++ULTCount;
         } else {
             TID = ++KLTCount;
         }
         this.parentPID = parentPID;
         this.bursts = burstList;
+        trace = new ArrayList<>();
     }
 
     /**
      *
      * @return true si terminó la burst actual
      */
-    public boolean execute() {
+    public boolean execute(int instant) {
 
-        boolean burstFinished = bursts.get(currentBurstIndex).execute();
+        trace.set(trace.size() -1, instant);
+
+        boolean burstFinished = bursts.get(currentBurstIndex).execute(instant);
 
         if (burstFinished){
             int burstType = bursts.get(currentBurstIndex).getType();
@@ -70,6 +81,14 @@ public abstract class Thread {
 
     public int getParentPID() {
         return parentPID;
+    }
+
+    public List<Integer> getTrace() {
+        return trace;
+    }
+
+    public void addInstant() {
+        trace.add(0);
     }
 
     @Override

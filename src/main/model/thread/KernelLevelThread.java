@@ -1,5 +1,6 @@
 package main.model.thread;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
@@ -12,18 +13,21 @@ public class KernelLevelThread extends Thread {
     private UserLevelThread blockedThread;  // solo puede haber un solo ULT bloqueado
     private ThreadLibraryType threadLibraryType;
     private Algorithm algortimo;
-    private TNode tempNode;
 
     public KernelLevelThread(int parentPID, List<UserLevelThread> threads, ThreadLibraryType threadLibraryType) {
-        super(parentPID, null); // le paso null porque no existen los KLT puros
+        super(parentPID, null, "KLT"); // le paso null porque no existen los KLT puros
         this.threads = threads;
         this.threadLibraryType = threadLibraryType;
         this.algortimo = new FIFO(); //Hacer un switch
+        readyThreads = new LinkedList<>();
     }
 
-    public boolean execute() {
-        if(blockedThread == null){
-            tempNode = algortimo.execute(readyThreads, runningThread);
+    public boolean executeCPU(int core) {
+        TNode tempNode;
+
+        if(blockedThread == null) {
+            tempNode = algortimo.execute(readyThreads, runningThread, core);
+
             if(tempNode.getRunning() == null){
                 runningThread = null;
                 if(tempNode.getBlocked() == null){ //FINISHED
@@ -43,8 +47,13 @@ public class KernelLevelThread extends Thread {
                 setState(ThreadState.RUNNING);
                 return false;
             }
-        }else{
-            if(blockedThread.execute()){
+        }
+        return false; //Ver bien esto
+    }
+
+    public boolean executeIO(int device) {
+        TNode tempNode;
+            if(blockedThread.execute(device)){
                 setState(ThreadState.READY);
                 readyThreads.add(blockedThread);
                 blockedThread = null;
@@ -52,8 +61,8 @@ public class KernelLevelThread extends Thread {
             }else{
                 return false;
             }
-        }
     }
+
 
     public UserLevelThread getRunningThread() {
         return runningThread;
@@ -74,5 +83,9 @@ public class KernelLevelThread extends Thread {
             }
         }
         return true;
+    }
+
+    public Thread getBlocked() {
+        return blockedThread;
     }
 }
