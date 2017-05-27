@@ -13,9 +13,9 @@ public class SPN implements Algorithm {
                 if (thread.getCurrentBurst().getTime() < shortest.getCurrentBurst().getTime()) {
                     shortest = thread;
                 }
-                ults.remove(shortest);
-                runningUlt = shortest;
             }
+            ults.remove(shortest);
+            runningUlt = shortest;
         }
         if(runningUlt != null){
             runningUlt.setState(ThreadState.RUNNING);

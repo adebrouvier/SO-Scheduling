@@ -25,6 +25,10 @@ public class KernelLevelThread extends Thread {
                 break;
             case RR:
                 algorithm = new RR(4); // TODO FIX HARDCODEO
+            case SPN:
+                algorithm = new SPN();
+            case SRT:
+                algorithm = new SRT();
         }
         readyThreads = new LinkedList<>();
     }

@@ -12,9 +12,9 @@ public class SRT implements Algorithm {
                 if (thread.getCurrentBurst().getRemainingTime() < shortest.getCurrentBurst().getRemainingTime()) {
                     shortest = thread;
                 }
-                ults.remove(shortest);
-                runningUlt = shortest;
             }
+            ults.remove(shortest);
+            runningUlt = shortest;
         }
         if(runningUlt != null){
             runningUlt.setState(ThreadState.RUNNING);
