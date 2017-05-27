@@ -86,6 +86,8 @@ public abstract class Scheduler {
                 }
             }
         }
+
+        OSTrace.add(0);
     }
 
     public void runIO() {
@@ -185,5 +187,15 @@ public abstract class Scheduler {
         }
 
         return blockedThreads;
+    }
+
+    private List<Integer> OSTrace = new ArrayList<>();
+
+    protected void addOSStep() {
+        OSTrace.set(OSTrace.size() - 1 , -1); // corre el os
+    }
+
+    public List<Integer> getOSTrace() {
+        return new ArrayList<>(OSTrace);
     }
 }

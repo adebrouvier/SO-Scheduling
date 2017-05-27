@@ -1,18 +1,19 @@
 package main.controller;
 
 import main.controller.configuration.Configuration;
-import main.model.Core;
+import main.controller.input.InputListener;
 import main.model.process.Process;
 import main.model.process.Scheduler;
 import main.model.process.SchedulerFIFO;
 import main.model.process.SchedulerRoundRobin;
 import main.model.thread.UserLevelThread;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
-public class Simulation {
+public class Simulation extends JPanel implements Runnable {
 
     /** Arrival time -> processes/threads */
     private Map<Integer, List<Process>> processes;
@@ -22,6 +23,8 @@ public class Simulation {
     private Gantt gantt;
 
     private int time;
+
+    private InputListener input;
 
     public Simulation(Configuration cfg) {
         int cores = cfg.getCores();
@@ -41,30 +44,47 @@ public class Simulation {
         time = 0;
 
         gantt = new Gantt();
+
+        setPreferredSize(new Dimension(500, 500));
+        setFocusable(true);
+        requestFocus();
     }
 
-
     public void start() {
+        running = true;
+        input = new InputListener();
+        addKeyListener(input);
 
-        boolean running = true;
+        Thread thread = new Thread(this);
+        thread.start();
+    }
+
+    private boolean running;
+
+    @Override
+    public void run() {
+
+        long timer = System.currentTimeMillis();
 
         while (true) {
 
-            // TODO check input (pause, resume, etc)
+            input.updateKeys();
 
-            if (running) {
-                scheduler.execute(processes.get(time), threads.get(time), time);
-                gantt.addTraceNode(scheduler, time);
-                gantt.print(time);
-                time++;
+            if (System.currentTimeMillis() - timer > 1000) { // every second
+                timer += 1000;
 
-                try {
-                    //System.out.wait(1000);
-                    TimeUnit.SECONDS.sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                if (input.isPressed(InputListener.PAUSE)) {
+                    running = !running;
+                }
+
+                if (running) {
+                    scheduler.execute(processes.get(time), threads.get(time), time);
+                    gantt.addTraceNode(scheduler);
+                    gantt.print(time);
+                    time++;
                 }
             }
         }
     }
+
 }

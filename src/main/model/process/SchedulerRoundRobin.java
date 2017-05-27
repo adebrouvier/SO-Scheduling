@@ -30,8 +30,7 @@ public class SchedulerRoundRobin extends Scheduler {
         if (!core.isRunning()) {
             Process p = readyQueue.peek(); // puede haber mas de un klt del mismo proceso en distintos cores
             if (p == null) {
-                System.out.println("CORRE EL SO -----------------------------------");
-                //TODO Corre el SO
+                addOSStep();
                 return;
             }
             KernelLevelThread aux;
@@ -98,5 +97,6 @@ public class SchedulerRoundRobin extends Scheduler {
             //readyQueue.poll(); // TODO buscar una mejor forma
         }
     }
+
 }
 
