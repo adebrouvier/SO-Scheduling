@@ -8,7 +8,7 @@ import java.util.List;
 public abstract class Thread {
 
     private List<Burst> bursts;
-    private ThreadState state;
+    protected ThreadState state;
     private int currentBurstIndex;
 
     /** Thread ID and parent Process ID */

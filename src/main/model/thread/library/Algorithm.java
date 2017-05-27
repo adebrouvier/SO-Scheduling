@@ -1,4 +1,6 @@
-package main.model.thread;
+package main.model.thread.library;
+
+import main.model.thread.UserLevelThread;
 
 import java.util.Queue;
 

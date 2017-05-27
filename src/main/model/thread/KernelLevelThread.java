@@ -1,5 +1,7 @@
 package main.model.thread;
 
+import main.model.thread.library.*;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,6 +31,9 @@ public class KernelLevelThread extends Thread {
                 break;
             case SRT:
                 algorithm = new SRT();
+                break;
+            case HRRN:
+                algorithm = new HRRN();
                 break;
         }
         readyThreads = new LinkedList<>();
@@ -129,5 +134,11 @@ public class KernelLevelThread extends Thread {
 
     public Thread getBlocked() {
         return blockedThread;
+    }
+
+    public void update(){
+        for (UserLevelThread u : threads){
+            u.update();
+        }
     }
 }

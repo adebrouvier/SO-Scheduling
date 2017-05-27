@@ -1,22 +1,24 @@
-package main.model.thread;
+package main.model.thread.library;
+
+import main.model.thread.ThreadState;
+import main.model.thread.UserLevelThread;
 
 import java.util.Queue;
 
-public class HRRN implements Algorithm {
-    //No nos faltaria agregar una variable de tiempo de espera?
+
+public class SPN implements Algorithm {
     @Override
     public UserLevelThread execute(Queue<UserLevelThread> ults, UserLevelThread runningUlt, int core) {
 
-
         if(runningUlt == null) {
-            UserLevelThread highest = ults.peek();
+            UserLevelThread shortest = ults.peek();
             for (UserLevelThread thread : ults) {
-                if (thread.getCurrentBurst().getPriority() > highest.getCurrentBurst().getPriority()) {//See getPriority()
-                    highest = thread;
+                if (thread.getCurrentBurst().getTime() < shortest.getCurrentBurst().getTime()) {
+                    shortest = thread;
                 }
-                ults.remove(highest);
-                runningUlt = highest;
             }
+            ults.remove(shortest);
+            runningUlt = shortest;
         }
         if(runningUlt != null){
             runningUlt.setState(ThreadState.RUNNING);
@@ -24,7 +26,6 @@ public class HRRN implements Algorithm {
         }
 
         return runningUlt;
-
 
     }
 }

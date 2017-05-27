@@ -1,20 +1,25 @@
-package main.model.thread;
+package main.model.thread.library;
+
+import main.model.thread.ThreadState;
+import main.model.thread.UserLevelThread;
 
 import java.util.Queue;
 
-public class SRT implements Algorithm {
+public class HRRN implements Algorithm {
+
     @Override
     public UserLevelThread execute(Queue<UserLevelThread> ults, UserLevelThread runningUlt, int core) {
 
+
         if(runningUlt == null) {
-            UserLevelThread shortest = ults.peek();
+            UserLevelThread highest = ults.peek();
             for (UserLevelThread thread : ults) {
-                if (thread.getCurrentBurst().getRemainingTime() < shortest.getCurrentBurst().getRemainingTime()) {
-                    shortest = thread;
+                if (thread.getCurrentBurst().getPriority() > highest.getCurrentBurst().getPriority()) {//See getPriority()
+                    highest = thread;
                 }
+                ults.remove(highest);
+                runningUlt = highest;
             }
-            ults.remove(shortest);
-            runningUlt = shortest;
         }
         if(runningUlt != null){
             runningUlt.setState(ThreadState.RUNNING);
@@ -22,7 +27,5 @@ public class SRT implements Algorithm {
         }
 
         return runningUlt;
-
     }
 }
-

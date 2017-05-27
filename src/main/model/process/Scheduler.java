@@ -61,6 +61,10 @@ public abstract class Scheduler {
         for (Core core : cores) {
             executeAlgorithm(core);         // ejecuto el proceso correspondiente segun la planificacion
         }
+
+        for (Process p: processes){
+            p.update();                 //actualizo los tiempos de espera
+        }
     }
 
     private void resetULTs(Collection<? extends Thread> threads, int time) {

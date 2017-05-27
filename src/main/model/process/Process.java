@@ -138,4 +138,10 @@ public class Process {
 
         return ready;
     }
+
+    public void update() {
+        for (KernelLevelThread k : threads){
+            k.update();
+        }
+    }
 }
