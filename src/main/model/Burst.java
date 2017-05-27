@@ -32,4 +32,6 @@ public class Burst {
     public int getRemainingTime() {
         return remainingTime;
     }
+
+    public int getPriority(){ return 0; } //1+(waitingtime/estimatedRuntime) Lo que dice la wiki de HRRN
 }
