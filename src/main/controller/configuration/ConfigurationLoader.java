@@ -12,9 +12,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * TODO checkear que el arrival time sea MAYOR a 0, no permitimos arrival time 0
- */
 public class ConfigurationLoader {
 
     private String fileName = "./res/settings.so";
@@ -23,7 +20,7 @@ public class ConfigurationLoader {
     private int cores=1;
     private int IOCount=1;
     private int schedulingQuantum=1;
-    private int threadQuantum=2;
+    private int threadQuantum=0;
 
     public ConfigurationLoader(String [] args){
 
@@ -236,7 +233,7 @@ public class ConfigurationLoader {
 
            for (Integer kltNumber : kltMap.keySet()){
                KernelLevelThread k = new KernelLevelThread(processNumber,
-                       kltMap.get(kltNumber), ThreadLibraryType.valueOf(threadLibrary));
+                       kltMap.get(kltNumber), ThreadLibraryType.valueOf(threadLibrary),threadQuantum);
                kltList.add(k);
            }
 

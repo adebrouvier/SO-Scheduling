@@ -57,8 +57,6 @@ public class SchedulerRoundRobin extends Scheduler {
                     IO io = IODevices.get(klt.getBlocked().getCurrentBurst().getType() - 1);
                     io.add(klt);
 
-                    currentQuantum = 0;
-
                     process.setBlockedThread(klt);
                     process.setState(ProcessState.BLOCKED);
                 } else if (state == ThreadState.FINISHED) {
@@ -66,6 +64,7 @@ public class SchedulerRoundRobin extends Scheduler {
                         process.setState(ProcessState.FINISHED);
                     }
                 }
+                currentQuantum = 0;
             }
         }
         else {  // termino el quantum
@@ -83,7 +82,11 @@ public class SchedulerRoundRobin extends Scheduler {
                 Process p = readyQueue.poll();
                 if (p != null) {
                     klt = p.getNextKLT();
+                    core.setCurrentKLT(klt);
+                    klt.setState(ThreadState.RUNNING);
+                    p.setState(ProcessState.RUNNING);
                     klt.executeCPU(core.getID());
+                    currentQuantum++;
                 }
             }
 

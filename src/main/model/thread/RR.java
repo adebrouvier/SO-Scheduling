@@ -37,6 +37,7 @@ public class RR implements Algorithm {
                 runningUlt = queue.poll();
                 if (runningUlt != null) {
                     runningUlt.execute(core * (-1));
+                    currentQuantum++;
                 }
             }
         }

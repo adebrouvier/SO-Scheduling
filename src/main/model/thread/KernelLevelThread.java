@@ -12,29 +12,30 @@ public class KernelLevelThread extends Thread {
     private Queue<UserLevelThread> readyThreads;
     private UserLevelThread runningThread;
     private UserLevelThread blockedThread;  // solo puede haber un solo ULT bloqueado
-    private ThreadLibraryType threadLibraryType;
     private Algorithm algorithm;
 
-    public KernelLevelThread(int parentPID, List<UserLevelThread> threads, ThreadLibraryType threadLibraryType) {
+    public KernelLevelThread(int parentPID, List<UserLevelThread> threads, ThreadLibraryType threadLibraryType,int quantum) {
         super(parentPID, null, "KLT"); // le paso null porque no existen los KLT puros
         this.threads = threads;
-        this.threadLibraryType = threadLibraryType;
         switch (threadLibraryType) {
             case FIFO:
                 algorithm = new FIFO();
                 break;
             case RR:
-                algorithm = new RR(4); // TODO FIX HARDCODEO
+                algorithm = new RR(quantum);
+                break;
             case SPN:
                 algorithm = new SPN();
+                break;
             case SRT:
                 algorithm = new SRT();
+                break;
         }
         readyThreads = new LinkedList<>();
     }
 
     /**
-     * @param core
+     * @param core core to execute
      * @return true if this thread is finished or blocked
      */
     public boolean executeCPU(int core) {
@@ -66,31 +67,6 @@ public class KernelLevelThread extends Thread {
 
         return false;
     }
-
-//            if(tempNode.getRunning() == null) {
-//                UserLevelThread blocked = tempNode.getBlocked();
-//                if(blocked == null) { //FINISHED
-//                    //Logica de cuando un ult termina
-//                    runningThread.setState(ThreadState.FINISHED);
-//                    if (isFinished()) {
-//                        setState(ThreadState.FINISHED);
-//                    } else {
-//                        runningThread = null;
-//                        setState(ThreadState.READY);
-//                    }
-//                }else{ //BLOCKED
-//                    blockedThread = blocked;
-//                    setState(ThreadState.BLOCKED);
-//                }
-//                runningThread = null;
-//                return true;
-//            }else{
-//                runningThread = tempNode.getRunning();
-//                setState(ThreadState.RUNNING);
-//                return false;
-//            }
-//        }
-//        return false; //Ver bien esto
 
     private UserLevelThread unblockedThread = null;
 
