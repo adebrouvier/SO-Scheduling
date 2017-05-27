@@ -12,6 +12,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * TODO checkear que el arrival time sea MAYOR a 0, no permitimos arrival time 0
+ */
 public class ConfigurationLoader {
 
     private String fileName = "./res/settings.so";
