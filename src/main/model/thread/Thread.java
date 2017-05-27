@@ -26,7 +26,7 @@ public abstract class Thread {
     private List<Integer> trace;
 
     public Thread(int parentPID, List<Burst> burstList, String type) {
-        if (type == "ULT") {
+        if (type.equals("ULT")) {
             TID = ++ULTCount;
         } else {
             TID = ++KLTCount;
@@ -45,7 +45,7 @@ public abstract class Thread {
 
         trace.set(trace.size() -1, instant);
 
-        boolean burstFinished = bursts.get(currentBurstIndex).execute(instant);
+        boolean burstFinished = bursts.get(currentBurstIndex).execute();
 
         if (burstFinished) {
             int burstType = bursts.get(currentBurstIndex).getType();

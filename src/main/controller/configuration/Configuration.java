@@ -10,12 +10,12 @@ public class Configuration {
 
     private Map<Integer,List<Process>> processList;
     private Map<Integer, List<UserLevelThread>> threads;
-    private int cores;
-    private int IOCount;
-    private String processScheduling;
-    private String threadLibrary;
-    private Integer schedulingQuantum;
-    private Integer threadQuantum;
+    private final int cores;
+    private final int IOCount;
+    private final String processScheduling;
+    private final String threadLibrary;
+    private final Integer schedulingQuantum;
+    private final Integer threadQuantum;
 
     public Configuration(Map<Integer,List<Process>> processList, Map<Integer, List<UserLevelThread>> threads, Integer cores,
                          String threadLibrary, String processScheduling, int ioCount, int schedulingQuantum, int threadQuantum) {

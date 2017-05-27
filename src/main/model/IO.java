@@ -1,10 +1,11 @@
 package main.model;
 
-import main.model.process.Process;
 import main.model.thread.KernelLevelThread;
-import main.model.thread.ThreadState;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 /**
  */
@@ -20,7 +21,7 @@ public class IO {
         blockedKlts = new LinkedList<>();
     }
 
-    public boolean execute() {
+    public void execute() {
         readyKlt = null;
 
         if (!isBusy()) {
@@ -33,10 +34,8 @@ public class IO {
                 // no es necesario checkear si el thread esta terminado
                 readyKlt = currentKlt;
                 currentKlt = null;
-                return true;
             }
         }
-        return false;
     }
 
     public boolean isBusy(){

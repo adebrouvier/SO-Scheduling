@@ -11,8 +11,6 @@ import java.util.*;
 
 /**
  * Clase principal
- * TODO validar que los procesos tengan arrival time positivo, etc (Cuando se crea el proceso)
- * TODO checkear en el parseo que los bursts esten intercalados y que termine siempre con burst de cpu
  */
 public abstract class Scheduler {
 
@@ -51,7 +49,7 @@ public abstract class Scheduler {
      * @param processes new processes created in this instant of time
      * @param threads new threads created in this instant of time
      */
-    public boolean execute(Collection<Process> processes, Collection<? extends Thread> threads, int time) {
+    public void execute(Collection<Process> processes, Collection<? extends Thread> threads, int time) {
         resetULTs(threads, time);
 
         runIO();                    // ejecuto io
@@ -63,8 +61,6 @@ public abstract class Scheduler {
         for (Core core : cores) {
             executeAlgorithm(core);         // ejecuto el proceso correspondiente segun la planificacion
         }
-
-        return false;
     }
 
     private void resetULTs(Collection<? extends Thread> threads, int time) {
@@ -113,18 +109,15 @@ public abstract class Scheduler {
                 }
             }
 
-            if (io.execute()) { // se termino la burst de io
-//                Process process = processes.get(klt.getParentPID());
-//                process.setBlockedThread(null);
-            }
+            io.execute();
         }
     }
 
     public abstract void executeAlgorithm(Core core);
 
     /**
-     * TODO Each process arrival time is the minimum of its respective ULTs arrival times
-     * @param processes
+     * Add process that arrived at an instant of time
+     * @param processes list of process that arrived
      */
     private void addProcesses(Collection<Process> processes) {
         if (processes == null) {
@@ -141,7 +134,7 @@ public abstract class Scheduler {
 
     /**
      * Activates threads.
-     * @param threads
+     * @param threads list of threads
      */
     private void addThreads(Collection<? extends Thread> threads) {
         if (threads == null) {

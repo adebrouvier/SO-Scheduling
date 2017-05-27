@@ -33,7 +33,6 @@ public class SchedulerRoundRobin extends Scheduler {
                 addOSStep();
                 return;
             }
-            KernelLevelThread aux;
             KernelLevelThread klt = p.getNextKLT();
 
             core.setCurrentKLT(klt);

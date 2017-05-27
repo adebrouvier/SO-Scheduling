@@ -12,8 +12,7 @@ public class Burst {
         this.remainingTime = time;
     }
 
-    public boolean execute(int instant) {
-        //System.out.println(instant);
+    public boolean execute() {
 
         if (remainingTime > 0)
             remainingTime--;

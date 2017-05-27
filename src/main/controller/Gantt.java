@@ -82,7 +82,7 @@ public class Gantt {
 
     /**
      * Adds a new column to the Gantt diagram
-     * @param scheduler
+     * @param scheduler scheduler that needs to be printed
      */
     public void addTraceNode(Scheduler scheduler) {
         TraceNode node = new TraceNode();
@@ -107,7 +107,7 @@ public class Gantt {
 
     /**
      * Prints the Gantt diagram at a given time
-     * @param time
+     * @param time time to print
      */
     public void print(int time) {
         if (time >= trace.size()) {
