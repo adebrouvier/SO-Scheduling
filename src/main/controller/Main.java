@@ -11,8 +11,10 @@ public class Main {
         ConfigurationLoader cl = new ConfigurationLoader(args);
         Configuration cfg = cl.load();
 
-        JFrame frame = new JFrame("Scheduling");
         Simulation simulation = new Simulation(cfg);
+        simulation.setOpaque(true);
+
+        JFrame frame = new JFrame("Scheduling");
         frame.setContentPane(simulation);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setResizable(false);
