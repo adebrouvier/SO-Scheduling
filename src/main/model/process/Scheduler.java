@@ -106,6 +106,7 @@ public abstract class Scheduler {
                 klt.addReady(ult);
 
                 Process process = processes.get(klt.getParentPID());
+                process.setBlockedThread(null);
                 process.setState(ProcessState.READY);
                 process.addReady(klt);
 
@@ -151,8 +152,10 @@ public abstract class Scheduler {
             Process parent = processes.get(thread.getParentPID());
             KernelLevelThread klt = parent.getThread(((UserLevelThread)thread).getParentKltID());
             klt.addReady((UserLevelThread) thread);
+            klt.setState(ThreadState.READY);
             parent.addReady(klt);
 
+            //TODO SLEEP STATE
 //            if (parent.getState().equals(ProcessState.SLEEP)) {
 //                  readyQueue.add(parent);
 //            }

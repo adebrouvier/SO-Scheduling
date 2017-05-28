@@ -22,6 +22,7 @@ public class Gantt {
         private List<String> runningProcesses;
         private List<String> blockedProcesses;
         private List<String> readyProcesses;
+        private List<String> finishedProcesses;
 
         TraceNode() {
             traceMap = new HashMap<>();
@@ -29,6 +30,7 @@ public class Gantt {
             runningProcesses = new ArrayList<>();
             blockedProcesses = new ArrayList<>();
             readyProcesses = new ArrayList<>();
+            finishedProcesses = new ArrayList<>();
         }
 
         public void addProcess(String id, ProcessState state) {
@@ -41,6 +43,9 @@ public class Gantt {
                     break;
                 case READY:
                     readyProcesses.add(id);
+                    break;
+                case FINISHED:
+                    finishedProcesses.add(id);
                     break;
             }
         }
@@ -71,6 +76,10 @@ public class Gantt {
 
         public List<String> getReadyProcesses() {
             return readyProcesses;
+        }
+
+        public List<String> getFinishedProcesses() {
+            return finishedProcesses;
         }
     }
 
@@ -160,6 +169,7 @@ public class Gantt {
         System.out.println("RUNNING PROCESSES: " + node.getRunningProcesses());
         System.out.println("BLOCKED PROCESSES: " + node.getBlockedProcesses());
         System.out.println("READY PROCESSES: " + node.getReadyProcesses());
+        System.out.println("FINISHED PROCESSES: " + node.getFinishedProcesses());
         System.out.println();
     }
 

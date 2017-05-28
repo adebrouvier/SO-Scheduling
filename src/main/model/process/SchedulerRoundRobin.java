@@ -30,13 +30,11 @@ public class SchedulerRoundRobin extends Scheduler {
             Process p = readyQueue.peek(); // puede haber mas de un klt del mismo proceso en distintos cores
             if (p == null) {
                 addOSStep();
+                timeMap.put(core.getID(), 0);
                 return;
             }
             KernelLevelThread klt = p.getNextKLT();
-
             core.setCurrentKLT(klt);
-            klt.setState(ThreadState.RUNNING);
-            p.setState(ProcessState.RUNNING);
         }
 
         int currentQuantum = timeMap.get(core.getID());
@@ -46,6 +44,7 @@ public class SchedulerRoundRobin extends Scheduler {
 
         if (currentQuantum != quantum) {        // quantum no termino
             klt.setState(ThreadState.RUNNING);
+            process.setState(ProcessState.RUNNING);
             currentQuantum++;
             if (klt.executeCPU(core.getID())) {
                 ThreadState state = klt.getState();
@@ -60,6 +59,8 @@ public class SchedulerRoundRobin extends Scheduler {
                 } else if (state == ThreadState.FINISHED) {
                     if (process.isFinished()) {
                         process.setState(ProcessState.FINISHED);
+                    } else {
+                        process.setState(ProcessState.READY);
                     }
                 }
                 currentQuantum = 0;
@@ -67,32 +68,61 @@ public class SchedulerRoundRobin extends Scheduler {
         }
         else {  // termino el quantum
             currentQuantum = 0;
-
-            if (klt.getState() == ThreadState.RUNNING) {
+            core.setCurrentKLT(null);
+            if (klt.getState() == ThreadState.RUNNING) {    // todavia le queda algo por correr
                 klt.setState(ThreadState.READY);
                 process.setState(ProcessState.READY);
                 process.addReady(klt);
-                if (!readyQueue.contains(process)) {
-                    readyQueue.add(process);
-                }
 
-                Process p = readyQueue.poll();
-                if (p != null) {
-                    klt = p.getNextKLT();
+                // version 1
+                Process p = process;
+                process = readyQueue.poll();        // TODO ver bien esto, elegir una de las dos v
+                if (!readyQueue.contains(p)) {
+                    readyQueue.add(p);
+                }
+                if (process == null){
+                    process = p;
+                }
+                // version 2
+//                if (!readyQueue.contains(process)) {
+//                    readyQueue.add(process);
+//                }
+//                process = readyQueue.peek();
+
+
+                if (process != null) {
+                    klt = process.getNextKLT();
                     core.setCurrentKLT(klt);
                     klt.setState(ThreadState.RUNNING);
-                    p.setState(ProcessState.RUNNING);
-                    klt.executeCPU(core.getID());
+                    process.setState(ProcessState.RUNNING);
+                    if (klt.executeCPU(core.getID())) {
+                        ThreadState state = klt.getState();
+                        core.setCurrentKLT(null);
+
+                        if (state == ThreadState.BLOCKED) {
+                            IO io = IODevices.get(klt.getBlocked().getCurrentBurst().getType() - 1);
+                            io.add(klt);
+
+                            process.setBlockedThread(klt);
+                            process.setState(ProcessState.BLOCKED);
+                        } else if (state == ThreadState.FINISHED) {
+                            if (process.isFinished()) {
+                                process.setState(ProcessState.FINISHED);
+                            } else {
+                                process.setState(ProcessState.READY);
+                            }
+                        }
+                        currentQuantum = 0;
+                    }
                     currentQuantum++;
                 }
             }
-
         }
 
         timeMap.put(core.getID(),currentQuantum);
 
         //el thread sigue corriendo
-        if (!process.hasAvailableKLT()) { //Checkea que si al proceso le queda algo para correr.
+        if (process != null && !process.hasAvailableKLT()) { //Checkea que si al proceso le queda algo para correr.
             readyQueue.remove(process);
             //readyQueue.poll(); // TODO buscar una mejor forma
         }

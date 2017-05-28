@@ -42,14 +42,6 @@ public class Process {
         this.state = state;
     }
 
-    public boolean isBlocked() {
-        boolean blocked = blockedThread != null;
-        if (blocked) {
-            setState(ProcessState.BLOCKED);
-        }
-        return blocked;
-    }
-
     public boolean isFinished() {
         for (KernelLevelThread klt: threads) {
             if (klt.getState() != ThreadState.FINISHED)
@@ -118,7 +110,9 @@ public class Process {
     }
 
     public void setBlockedThread(KernelLevelThread blocked) {
-        blocked.setState(ThreadState.BLOCKED);
+        if (blocked != null) {
+            blocked.setState(ThreadState.BLOCKED);
+        }
         this.blockedThread = blocked;
     }
 
