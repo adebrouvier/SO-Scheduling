@@ -37,6 +37,7 @@ public class Simulation extends JPanel implements Runnable {
     private boolean running;
 
     public Simulation(Configuration cfg) {
+
         int cores = cfg.getCores();
         int ioCount = cfg.getIOCount();
 
@@ -54,6 +55,7 @@ public class Simulation extends JPanel implements Runnable {
         time = pausedTime = 0;
 
         gantt = new Gantt();
+        Log.addConfiguration(cfg);
 
         setPreferredSize(new Dimension(500, 200));
         setFocusable(true);
@@ -100,13 +102,13 @@ public class Simulation extends JPanel implements Runnable {
      */
     @Override
     public void run() {
-
         long timer = System.currentTimeMillis();
 
         while (true) {
             if (System.currentTimeMillis() - timer > 1000) { // every second
                 timer += 1000;
                 if (running) {
+                    Log.addTimeStamp(time);
                     scheduler.execute(processes.get(time), threads.get(time), time);
                     gantt.addTraceNode(scheduler);
                     gantt.print(time);

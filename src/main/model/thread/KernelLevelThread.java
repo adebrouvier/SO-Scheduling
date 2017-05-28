@@ -1,5 +1,6 @@
 package main.model.thread;
 
+import main.controller.Log;
 import main.model.thread.library.*;
 
 import java.util.ArrayList;
@@ -124,6 +125,11 @@ public class KernelLevelThread extends Thread {
         for (UserLevelThread u : threads){
             u.update();
         }
+    }
+
+    public void setState(ThreadState state) {
+        super.setState(state);
+        Log.addKLTStateChange(getTID(), state);
     }
 
     public UserLevelThread getUnblockedThread(){

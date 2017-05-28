@@ -1,5 +1,6 @@
 package main.model.process;
 
+import main.controller.Log;
 import main.model.thread.KernelLevelThread;
 import main.model.thread.ThreadState;
 
@@ -45,6 +46,7 @@ public class Process {
 
     public void setState(ProcessState state) {
         this.state = state;
+        Log.addProcessStateChange(PID, state);
     }
 
     public boolean isFinished() {

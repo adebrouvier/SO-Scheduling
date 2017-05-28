@@ -1,5 +1,6 @@
 package main.model.thread;
 
+import main.controller.Log;
 import main.model.Burst;
 
 import java.util.List;
@@ -30,16 +31,21 @@ public class UserLevelThread extends Thread {
         }
     }
 
+    public void setState(ThreadState state) {
+        super.setState(state);
+        Log.addULTStateChange(getTID(), state);
+    }
+
     public int getParentKltID() {
         return parentKltID;
     }
 
-    public int getWaitTime (){
-        return this.waitTime;
-    }
-
     public int getResponseRate(){
         return 1+(this.waitTime/(this.getCurrentBurst().getRemainingTime()));
+    }
+
+    public int getWaitTime (){
+        return this.waitTime;
     }
 }
 

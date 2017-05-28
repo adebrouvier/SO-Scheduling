@@ -1,5 +1,6 @@
 package main.model;
 
+import main.controller.Log;
 import main.model.thread.KernelLevelThread;
 
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ public class IO {
                 // no es necesario checkear si el thread esta terminado
                 readyKlt = currentKlt;
                 currentKlt = null;
+                Log.addIOUnblockedKLT(ID, readyKlt.getTID());
             }
         }
     }
@@ -55,6 +57,7 @@ public class IO {
 
     public void add(KernelLevelThread klt) {
         blockedKlts.add(klt);
+        Log.addIOBlockedKLT(ID, klt.getTID());
     }
 
     public List<KernelLevelThread> getBlockedThreads() {

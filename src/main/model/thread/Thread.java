@@ -37,7 +37,7 @@ public abstract class Thread {
         this.parentPID = parentPID;
         this.bursts = burstList;
         trace = new ArrayList<>();
-        setState(ThreadState.NEW);
+        this.state = ThreadState.NEW;
     }
 
     /**
