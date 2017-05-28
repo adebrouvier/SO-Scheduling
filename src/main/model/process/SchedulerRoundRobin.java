@@ -25,7 +25,6 @@ public class SchedulerRoundRobin extends Scheduler {
         }
     }
 
-
     public void executeAlgorithm(Core core) {
         if (!core.isRunning()) {
             Process p = readyQueue.peek(); // puede haber mas de un klt del mismo proceso en distintos cores
@@ -71,11 +70,10 @@ public class SchedulerRoundRobin extends Scheduler {
 
             if (klt.getState() == ThreadState.RUNNING) {
                 klt.setState(ThreadState.READY);
-
-                Process parent = processes.get(klt.getParentPID());
-
-                if (!readyQueue.contains(parent)) {
-                    readyQueue.add(parent);
+                process.setState(ProcessState.READY);
+                process.addReady(klt);
+                if (!readyQueue.contains(process)) {
+                    readyQueue.add(process);
                 }
 
                 Process p = readyQueue.poll();
