@@ -5,6 +5,9 @@ import main.model.Burst;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Each thread has a {@link ThreadState} and a list of {@link Burst}s to execute.
+ */
 public abstract class Thread {
 
     private List<Burst> bursts;
@@ -19,9 +22,9 @@ public abstract class Thread {
     private static int ULTCount;
 
     /**
-     * <0 = cpu -n
-     * 0 = no corrio
-     * >0 = io n
+     * <0 = corrio cpu, core -n
+     * 0  = no corrio
+     * >0 = corrio io, device n
      */
     private List<Integer> trace;
 
@@ -39,11 +42,11 @@ public abstract class Thread {
 
     /**
      *
-     * @return true si terminó la burst actual
+     * @return true if current burst finished
      */
-    public boolean execute(int instant) {
+    public boolean execute(int step) {
 
-        trace.set(trace.size() -1, instant);
+        trace.set(trace.size() -1, step);
 
         boolean burstFinished = bursts.get(currentBurstIndex).execute();
 
@@ -88,7 +91,7 @@ public abstract class Thread {
         return trace;
     }
 
-    public void addInstant() {
+    public void addStep() {
         trace.add(0);
     }
 

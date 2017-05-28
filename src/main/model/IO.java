@@ -8,12 +8,16 @@ import java.util.List;
 import java.util.Queue;
 
 /**
+ * Represents an IO device. Has a queue of {@link KernelLevelThread} and uses FIFO scheduling
+ * to determine which KLT to execute.
  */
 public class IO {
 
     private final int ID;
     private Queue<KernelLevelThread> blockedKlts;
+    /** Current KLT using this device */
     private KernelLevelThread currentKlt;
+    /** KLT that finished using this device in the last instant */
     private KernelLevelThread readyKlt;
 
     public IO (int ID){
@@ -21,6 +25,9 @@ public class IO {
         blockedKlts = new LinkedList<>();
     }
 
+    /**
+     * Executes an instant of IO for the current KLT
+     */
     public void execute() {
         readyKlt = null;
 
@@ -42,24 +49,12 @@ public class IO {
         return currentKlt != null;
     }
 
-    /**
-     *
-     * @return el KLT si se desbloqueó
-     */
     public KernelLevelThread getReady() {
         return  readyKlt;
     }
 
-    public KernelLevelThread getCurrentKlt() {
-        return currentKlt;
-    }
-
     public void add(KernelLevelThread klt) {
         blockedKlts.add(klt);
-    }
-
-    public int getID() {
-        return ID;
     }
 
     public List<KernelLevelThread> getBlockedThreads() {
@@ -68,5 +63,13 @@ public class IO {
             klts.add(currentKlt);
         }
         return klts;
+    }
+
+    public KernelLevelThread getCurrentKlt() {
+        return currentKlt;
+    }
+
+    public int getID() {
+        return ID;
     }
 }

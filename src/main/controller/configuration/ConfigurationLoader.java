@@ -3,7 +3,7 @@ package main.controller.configuration;
 import main.model.Burst;
 import main.model.process.Process;
 import main.model.thread.KernelLevelThread;
-import main.model.thread.ThreadLibraryType;
+import main.model.thread.library.ThreadLibraryType;
 import main.model.thread.UserLevelThread;
 import org.apache.commons.cli.*;
 

@@ -5,6 +5,7 @@ import main.model.Burst;
 import java.util.List;
 
 /**
+ * @see Thread
  */
 public class UserLevelThread extends Thread {
 
@@ -16,10 +17,9 @@ public class UserLevelThread extends Thread {
         this.parentKltID = parentKltID;
     }
 
-    public int getParentKltID() {
-        return parentKltID;
-    }
-
+    /**
+     * Updates this ULT's waiting time
+     */
     public void update() {
 
         if (state == ThreadState.READY){
@@ -28,6 +28,10 @@ public class UserLevelThread extends Thread {
         if (state == ThreadState.BLOCKED | state == ThreadState.RUNNING){
             waitTime = 0;
         }
+    }
+
+    public int getParentKltID() {
+        return parentKltID;
     }
 
     public int getWaitTime (){

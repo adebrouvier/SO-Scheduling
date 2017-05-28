@@ -7,6 +7,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+/**
+ * Represents a KLT of a {@link main.model.process.Process}.
+ * Each KLT has a list of {@link UserLevelThread} and uses and {@link Algorithm} to schedule their execution.
+ * this algorithm is different to the {@link main.model.process.Scheduler}
+ */
 public class KernelLevelThread extends Thread {
 
     private List<UserLevelThread> threads;
@@ -14,9 +19,11 @@ public class KernelLevelThread extends Thread {
     private Queue<UserLevelThread> readyThreads;
     private UserLevelThread runningThread;
     private UserLevelThread blockedThread;  // solo puede haber un solo ULT bloqueado
+    private UserLevelThread unblockedThread; // ult que se desbloqueó en el instante anterior
+
     private Algorithm algorithm;
 
-    public KernelLevelThread(int parentPID, List<UserLevelThread> threads, ThreadLibraryType threadLibraryType,int quantum) {
+    public KernelLevelThread(int parentPID, List<UserLevelThread> threads, ThreadLibraryType threadLibraryType, int quantum) {
         super(parentPID, null, "KLT"); // le paso null porque no existen los KLT puros
         this.threads = threads;
         switch (threadLibraryType) {
@@ -40,12 +47,11 @@ public class KernelLevelThread extends Thread {
     }
 
     /**
+     * Executes and instant of CPU burst
      * @param core core to execute
-     * @return true if this thread is finished or blocked
+     * @return true if this KLT is finished or blocked
      */
     public boolean executeCPU(int core) {
-//        TNode tempNode;
-//
         runningThread = algorithm.execute(readyThreads, runningThread, core);
 
         if (runningThread != null) {
@@ -59,7 +65,7 @@ public class KernelLevelThread extends Thread {
                     runningThread = null;
                     return true;
                 case FINISHED:
-                    runningThread.setState(ThreadState.FINISHED);
+                    //runningThread.setState(ThreadState.FINISHED);
                     runningThread = null;
                     if (isFinished()) {
                         blockedThread = null; // no hace falta
@@ -73,25 +79,14 @@ public class KernelLevelThread extends Thread {
         return false;
     }
 
-    private UserLevelThread unblockedThread = null;
-
-//    public boolean executeIO(int device) {
-//        if(blockedThread.execute(device)){
-//            setState(ThreadState.READY);
-//            readyThreads.add(blockedThread);
-//            blockedThread = null;
-//            return true;
-//        }else{
-//            return false;
-//        }
-//    }
-
+    /**
+     * Executes an instant of IO burst
+     * @param device io device
+     * @return true if this KLT is no longer blocked
+     */
     public boolean executeIO(int device) {
         unblockedThread = null;
         if(blockedThread.execute(device)) {
-//            setState(ThreadState.READY);
-//            if (!readyThreads.contains(blockedThread))
-//                readyThreads.add(blockedThread);
             unblockedThread = blockedThread;
             blockedThread = null;
             return true;
@@ -100,29 +95,9 @@ public class KernelLevelThread extends Thread {
         return false;
     }
 
-    public UserLevelThread getUnblockedThread(){
-        return unblockedThread;
-    }
-
-
-    public UserLevelThread getRunningThread() {
-        return runningThread;
-    }
-
-    public void addReady(UserLevelThread ult) {
-        if (!readyThreads.contains(ult)) {
-            readyThreads.add(ult);
-        }
-    }
-
-    public List<UserLevelThread> getReadyThreads() {
-        return new ArrayList<>(readyThreads);
-    }
-
-    public List<UserLevelThread> getThreads (){
-        return threads;
-    }
-
+    /**
+     * @return true if every ULT of this KLT is finished
+     */
     public boolean isFinished() {
         for (UserLevelThread ult : threads) {
             if (ult.getState() != ThreadState.FINISHED) {
@@ -132,13 +107,43 @@ public class KernelLevelThread extends Thread {
         return true;
     }
 
-    public Thread getBlocked() {
-        return blockedThread;
+    /**
+     * Adds a ready ULT to the readyThreads Queue
+     * @param ult
+     */
+    public void addReady(UserLevelThread ult) {
+        if (!readyThreads.contains(ult)) {
+            readyThreads.add(ult);
+        }
     }
 
+    /**
+     * Updates every ULT
+     */
     public void update(){
         for (UserLevelThread u : threads){
             u.update();
         }
     }
+
+    public UserLevelThread getUnblockedThread(){
+        return unblockedThread;
+    }
+
+    public List<UserLevelThread> getThreads(){
+        return threads;
+    }
+
+    public Thread getBlocked() {
+        return blockedThread;
+    }
+
+    public UserLevelThread getRunningThread() {
+        return runningThread;
+    }
+
+    public List<UserLevelThread> getReadyThreads() {
+        return new ArrayList<>(readyThreads);
+    }
+
 }

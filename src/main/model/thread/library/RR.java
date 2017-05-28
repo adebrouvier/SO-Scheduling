@@ -5,7 +5,6 @@ import main.model.thread.UserLevelThread;
 
 import java.util.Queue;
 
-
 public class RR implements Algorithm {
     private final int quantum;
     private int currentQuantum;

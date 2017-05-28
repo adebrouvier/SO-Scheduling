@@ -43,14 +43,20 @@ public class SchedulerFIFO extends Scheduler {
             } else if (state == ThreadState.FINISHED) {
                 if (process.isFinished()) {
                     process.setState(ProcessState.FINISHED);
+                } else if (process.hasAvailableKLT()) {
+                    readyQueue.add(process);
+                    return;
                 }
             }
         }
 
         //el thread sigue corriendo
-        if (!process.hasAvailableKLT()) { //Checkea que si al proceso le queda algo para correr.
+        if (cores.size() == 1) {
             readyQueue.remove(process);
-            //readyQueue.poll(); // TODO buscar una mejor forma
+        }
+        else if (process != null && !process.hasAvailableKLT()) {
+            readyQueue.remove(process); // TODO buscar una mejor forma
+            //readyQueue.poll();
         }
 
     }

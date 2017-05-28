@@ -2,6 +2,10 @@ package main.model;
 
 import main.model.thread.KernelLevelThread;
 
+/**
+ * A core serves as a container for a running {@link KernelLevelThread}
+ * Two different cores can run two different KLTs of the same {@link main.model.process.Process}.
+ */
 public class Core{
 
     private int ID;

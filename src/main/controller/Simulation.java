@@ -14,6 +14,12 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Scheduling simulation class. Updates the {@link Scheduler} every second
+ * and prints a {@link Gantt} diagram to the console.
+ * @see Simulation#run()
+ * Provides pause, back and forward functionality.
+ */
 public class Simulation extends JPanel implements Runnable {
 
     /** Arrival time -> processes/threads */
@@ -27,6 +33,8 @@ public class Simulation extends JPanel implements Runnable {
 
     private int time;
     private int pausedTime;
+
+    private boolean running;
 
     public Simulation(Configuration cfg) {
         int cores = cfg.getCores();
@@ -57,6 +65,7 @@ public class Simulation extends JPanel implements Runnable {
 
         pause = new JButton("PAUSE");
         pause.setBounds(getWidth() / 2 - 100, 10, 200, 50);
+        pause.setVisible(true);
         pause.setAction(new Pause());
 
         back = new JButton("BACK");
@@ -64,19 +73,19 @@ public class Simulation extends JPanel implements Runnable {
         back.setAction(new MoveInTime("BACK"));
         back.setActionCommand("back");
         back.setEnabled(false);
+        back.setVisible(true);
 
         forward = new JButton("FORWARD");
         forward.setBounds(getWidth() / 2 - 100, 50 * 2 + 10 * 3, 200, 50);
         forward.setAction(new MoveInTime("FORWARD"));
         forward.setActionCommand("forward");
         forward.setEnabled(false);
+        forward.setVisible(true);
 
         add(pause);
         add(back);
         add(forward);
     }
-
-    private boolean running;
 
     public void start() {
         createButtons();
@@ -85,6 +94,10 @@ public class Simulation extends JPanel implements Runnable {
         thread.start();
     }
 
+    /**
+     * Executes the scheduler every second giving it the new Processes and UserLevelThreads
+     * that arrived in that moment. Then prints the result in a Gantt diagram.
+     */
     @Override
     public void run() {
 

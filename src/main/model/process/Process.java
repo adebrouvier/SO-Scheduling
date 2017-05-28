@@ -8,6 +8,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+/**
+ * Represents a process to be scheduled and executed by a {@link Scheduler}.
+ * Each process has a {@link ProcessState} and a list of {@link KernelLevelThread}s
+ * To decide which thread to execute it always uses the method FirstComeFirstServed
+ */
 public class Process {
 
     private ProcessState state;

@@ -14,14 +14,14 @@ public class SchedulerRoundRobin extends Scheduler {
 
     private int quantum;
 
-    private Map<Integer, Integer> timeMap; // coreID -> time
+    private Map<Integer, Integer> quantumMap; // coreID -> time
 
     public SchedulerRoundRobin(int coreAmount, int ioCount, int quantum) {
         super(coreAmount, ioCount);
         this.quantum = quantum;
-        timeMap = new HashMap<>();
+        quantumMap = new HashMap<>();
         for (Core core : cores) {
-            timeMap.put(core.getID(), 0);
+            quantumMap.put(core.getID(), 0);
         }
     }
 
@@ -30,14 +30,14 @@ public class SchedulerRoundRobin extends Scheduler {
             Process p = readyQueue.peek(); // puede haber mas de un klt del mismo proceso en distintos cores
             if (p == null) {
                 addOSStep();
-                timeMap.put(core.getID(), 0);
+                quantumMap.put(core.getID(), 0);
                 return;
             }
             KernelLevelThread klt = p.getNextKLT();
             core.setCurrentKLT(klt);
         }
 
-        int currentQuantum = timeMap.get(core.getID());
+        int currentQuantum = quantumMap.get(core.getID());
 
         KernelLevelThread klt = core.getCurrentKLT();
         Process process = processes.get(klt.getParentPID());
@@ -49,6 +49,7 @@ public class SchedulerRoundRobin extends Scheduler {
             if (klt.executeCPU(core.getID())) {
                 ThreadState state = klt.getState();
                 core.setCurrentKLT(null);
+                currentQuantum = 0;
 
                 if (state == ThreadState.BLOCKED) {
                     IO io = IODevices.get(klt.getBlocked().getCurrentBurst().getType() - 1);
@@ -61,9 +62,13 @@ public class SchedulerRoundRobin extends Scheduler {
                         process.setState(ProcessState.FINISHED);
                     } else {
                         process.setState(ProcessState.READY);
+                        if (process.hasAvailableKLT()) {
+                            readyQueue.add(process);
+                            quantumMap.put(core.getID(),currentQuantum);
+                            return;
+                        }
                     }
                 }
-                currentQuantum = 0;
             }
         }
         else {  // termino el quantum
@@ -110,6 +115,11 @@ public class SchedulerRoundRobin extends Scheduler {
                                 process.setState(ProcessState.FINISHED);
                             } else {
                                 process.setState(ProcessState.READY);
+                                if (process.hasAvailableKLT()) {
+                                    readyQueue.add(process);
+                                    quantumMap.put(core.getID(),currentQuantum);
+                                    return;
+                                }
                             }
                         }
                         currentQuantum = 0;
@@ -119,12 +129,15 @@ public class SchedulerRoundRobin extends Scheduler {
             }
         }
 
-        timeMap.put(core.getID(),currentQuantum);
+        quantumMap.put(core.getID(),currentQuantum);
 
         //el thread sigue corriendo
-        if (process != null && !process.hasAvailableKLT()) { //Checkea que si al proceso le queda algo para correr.
+        if (cores.size() == 1) {
             readyQueue.remove(process);
-            //readyQueue.poll(); // TODO buscar una mejor forma
+        }
+        else if (process != null && !process.hasAvailableKLT()) {
+            readyQueue.remove(process); // TODO buscar una mejor forma
+            //readyQueue.poll();
         }
     }
 

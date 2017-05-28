@@ -14,7 +14,7 @@ public class Main {
         Simulation simulation = new Simulation(cfg);
         simulation.setOpaque(true);
 
-        JFrame frame = new JFrame("Scheduling");
+        JFrame frame = new JFrame("SO-Scheduling");
         frame.setContentPane(simulation);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setResizable(false);

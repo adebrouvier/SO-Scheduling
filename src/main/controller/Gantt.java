@@ -11,14 +11,14 @@ import java.util.*;
 public class Gantt {
 
     /**
-     * Clase interna que guarda el trace de todos los threads
-     * y las colas de bloqueados, listos y procesos ejecutandose en un instante
+     * Inner class that saves the trace of every thread and
+     * blocked, ready, running and finished processes
      */
     private class TraceNode {
         private Map<String, List<Integer>> traceMap; // Thread ID -> Trace
         private List<Integer> OSTrace;
 
-        //running, blocked and ready processes
+        //running, blocked, ready and finished processes
         private List<String> runningProcesses;
         private List<String> blockedProcesses;
         private List<String> readyProcesses;
