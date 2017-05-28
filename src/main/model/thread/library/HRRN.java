@@ -14,7 +14,7 @@ public class HRRN implements Algorithm {
         if(runningUlt == null) {
             UserLevelThread highest = ults.peek();
             for (UserLevelThread thread : ults) {
-                if (thread.getCurrentBurst().getPriority() > highest.getCurrentBurst().getPriority()) {//See getPriority()
+                if (thread.getResponseRate() > highest.getResponseRate()) {
                     highest = thread;
                 }
                 ults.remove(highest);

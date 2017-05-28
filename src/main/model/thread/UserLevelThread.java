@@ -33,5 +33,9 @@ public class UserLevelThread extends Thread {
     public int getWaitTime (){
         return this.waitTime;
     }
+
+    public int getResponseRate(){
+        return 1+(this.waitTime/(this.getCurrentBurst().getRemainingTime()));
+    }
 }
 
