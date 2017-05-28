@@ -59,11 +59,12 @@ public class Process {
     }
 
     public KernelLevelThread getNextKLT() {
-        for (KernelLevelThread klt : threads) {
-            if (klt.getState() == ThreadState.READY)
-                return klt;
-        }
-        return null;
+//        for (KernelLevelThread klt : threads) {
+//            if (klt.getState() == ThreadState.READY)
+//                return klt;
+//        }
+//        return null;
+        return readyThreads.poll();
     }
 
     public List<KernelLevelThread> getThreads() {
@@ -123,9 +124,9 @@ public class Process {
 
     public void addReady(KernelLevelThread klt) {
         klt.setState(ThreadState.READY);
-//        if (!readyThreads.contains(klt)) {
-//            readyThreads.add(klt);
-//        }
+        if (!readyThreads.contains(klt)) {
+            readyThreads.add(klt);
+        }
     }
 
     public List<KernelLevelThread> getReadyThreads() {

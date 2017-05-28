@@ -58,11 +58,12 @@ public abstract class Scheduler {
 
         addThreads(threads);        // agrego los threads nuevos si los hubiere
 
+        freeCores = 0;
         for (Core core : cores) {
             executeAlgorithm(core);         // ejecuto el proceso correspondiente segun la planificacion
         }
 
-        for (Process p: processes){
+        for (Process p: this.processes.values()){
             p.update();                 //actualizo los tiempos de espera
         }
     }
@@ -188,8 +189,13 @@ public abstract class Scheduler {
 
     private List<Integer> OSTrace = new ArrayList<>();
 
+    private int freeCores = 0;
+
     protected void addOSStep() {
-        OSTrace.set(OSTrace.size() - 1 , -1); // corre el os
+        freeCores++;
+        if (freeCores == cores.size()) {
+            OSTrace.set(OSTrace.size() - 1, -1); // corre el os
+        }
     }
 
     public List<Integer> getOSTrace() {

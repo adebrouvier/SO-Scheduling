@@ -118,7 +118,9 @@ public class Gantt {
     }
 
     private void print(TraceNode node, int time) {
-        for (String id : node.getTraceMap().keySet()) {
+        Set<String> set = new TreeSet<>(node.getTraceMap().keySet());
+
+        for (String id : set) {
             System.out.print(id + " | ");
             for (Integer step : node.getTraceMap().get(id)) {
                 if (step == 0) {
