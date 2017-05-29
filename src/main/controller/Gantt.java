@@ -129,8 +129,22 @@ public class Gantt {
     private void print(TraceNode node, int time) {
         Set<String> set = new TreeSet<>(node.getTraceMap().keySet());
 
+        int longestName = 0;
+
         for (String id : set) {
-            System.out.print(id + " | ");
+            if(id.length() > longestName) {
+                longestName = id.length();
+            }
+        }
+
+        int aux;
+        for (String id : set) {
+            System.out.print(id);
+            aux = id.length();
+            while(aux++ <  longestName) {
+                System.out.print(" ");
+            }
+            System.out.print(" | ");
             for (Integer step : node.getTraceMap().get(id)) {
                 if (step == 0) {
                     System.out.print("    ");
@@ -144,7 +158,11 @@ public class Gantt {
             System.out.println();
         }
 
-        System.out.print("-------|");
+        aux = 0;
+        while(aux++ <  longestName) {
+            System.out.print("-");
+        }
+        System.out.print("-|");
         for (int i = 1; i <= time; i++) {
             if (i > 99) {
                 System.out.print("-" + i + "--|");
@@ -155,7 +173,12 @@ public class Gantt {
             }
         }
         System.out.println();
-        System.out.print("  OS   | ");
+        System.out.print("OS");
+                aux = 0;
+        while(aux++ <  longestName - 2) {
+            System.out.print(" ");
+        }
+        System.out.print(" | ");
 
         for (int i = 1; i < node.getOSTrace().size(); i++) {
             if (node.getOSTrace().get(i) == 0) {
