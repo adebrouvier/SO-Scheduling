@@ -166,9 +166,8 @@ public abstract class Scheduler {
             klt.setState(ThreadState.READY);
             parent.addReady(klt);
 
-            //TODO SLEEP STATE
-//            if (parent.getState().equals(ProcessState.SLEEP)) {
-//                  readyQueue.add(parent);
+//            if (!readyQueue.contains(parent) && parent.getState()!=ProcessState.BLOCKED){
+//                readyQueue.add(parent);
 //            }
         }
     }

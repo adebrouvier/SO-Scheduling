@@ -104,9 +104,12 @@ public class Simulation extends JPanel implements Runnable {
     public void run() {
         long timer = System.currentTimeMillis();
 
+        int step = 1000;
+
         while (true) {
-            if (System.currentTimeMillis() - timer > 1000) { // every second
-                timer += 1000;
+
+            if (System.currentTimeMillis() - timer > step) { // every second
+                timer += step;
                 if (running) {
                     Log.addTimeStamp(time);
                     scheduler.execute(processes.get(time), threads.get(time), time);

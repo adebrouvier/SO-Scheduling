@@ -75,4 +75,28 @@ public class IO {
     public int getID() {
         return ID;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!obj.getClass().equals(this.getClass())) {
+            return false;
+        }
+
+        IO io = (IO) obj;
+
+        return io.ID == this.ID;
+    }
+
+    @Override
+    public int hashCode() {
+        return ID;
+    }
+
+    @Override
+    public String toString() {
+        return "I/O" + ID;
+    }
 }

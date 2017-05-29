@@ -146,7 +146,9 @@ public class Gantt {
 
         System.out.print("-------|");
         for (int i = 1; i <= time; i++) {
-            if (i > 9) {
+            if (i > 99) {
+                System.out.print("-" + i + "--|");
+            } else if (i > 9) {
                 System.out.print("--" + i + "--|");
             } else {
                 System.out.print("---" + i + "--|");

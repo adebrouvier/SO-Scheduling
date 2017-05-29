@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 public class ConfigurationLoader {
 
-    private String fileName = "./res/settings.so";
+    private String fileName = "./res/chk4";
     private String processPlanification = "FIFO";
     private String threadLibrary = "FIFO";
     private int cores=1;
