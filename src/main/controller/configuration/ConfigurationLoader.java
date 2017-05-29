@@ -112,6 +112,7 @@ public class ConfigurationLoader {
 
         Map <Integer,Map<Integer,List<UserLevelThread>>> processList = new HashMap<>();
         Map <Integer,Integer> ultArrivalTimes = new HashMap<>(); // <ID,arrivalTime>
+        Map<Integer, List<Integer>> klts = new HashMap<>(); // <PID, List<TID>
 
         try {
             Scanner sc = new Scanner(file);
@@ -149,9 +150,10 @@ public class ConfigurationLoader {
             String line;
 
             while(sc.hasNextLine()) {
+
                 line = sc.nextLine();
+
                 if(line.length()==0) {continue;}
-                //treatment
 
                 Scanner lineScanner = new Scanner(line);
 
@@ -164,13 +166,34 @@ public class ConfigurationLoader {
 
                 Matcher m1 = p1.matcher(identifier);
 
-                String[] tokens = identifier.split("_");
-
-                int processNumber = Integer.valueOf(tokens[0].substring(1));
-                int kernelThreadNumber = Integer.valueOf(tokens[1].substring(1));
-                int userThreadNumber = Integer.valueOf(tokens[2].substring(1));
-
                 if (m1.matches()) {
+
+                    String[] tokens = identifier.split("_");
+
+                    int processNumber = Integer.valueOf(tokens[0].substring(1));
+                    int kernelThreadNumber = Integer.valueOf(tokens[1].substring(1));
+                    int userThreadNumber = Integer.valueOf(tokens[2].substring(1));
+
+                    for (Integer PID : klts.keySet()) {
+
+                        if (PID.equals(processNumber)){
+                            continue;
+                        }
+
+                        List<Integer> kltList = klts.get(PID);
+
+                        if (kltList == null) {
+                            kltList = new ArrayList<>();
+                        }
+
+                        if (kltList.contains(kernelThreadNumber)) {
+                            System.err.println("Klt threads in different processes can't have the same id.");
+                            System.exit(1);
+                        } else {
+                            kltList.add(kernelThreadNumber);
+                            klts.put(processNumber, kltList);
+                        }
+                    }
 
                     int threadArrivalTime = lineScanner.nextInt();
 
@@ -179,7 +202,12 @@ public class ConfigurationLoader {
                         System.exit(1);
                     }
 
-                    ultArrivalTimes.put(userThreadNumber,threadArrivalTime);
+                    if (ultArrivalTimes.get(userThreadNumber) == null) {
+                        ultArrivalTimes.put(userThreadNumber, threadArrivalTime);
+                    }else{
+                        System.err.println("Two ult threads can't have the same id.");
+                        System.exit(1);
+                    }
 
                     List<Burst> burstList = new ArrayList<>();
 
