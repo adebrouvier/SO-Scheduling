@@ -52,32 +52,29 @@ public class KernelLevelThread extends Thread {
      * @param core core to execute
      * @return true if this KLT is finished or blocked
      */
-    public boolean executeCPU(int core) {
+    public void executeCPU(int core) {
         runningThread = algorithm.execute(readyThreads, runningThread, core);
 
         if (runningThread != null) {
             switch (runningThread.getState()) {
                 case READY:
                 case RUNNING:
-                    return false;
+                    break;
                 case BLOCKED:
                     setState(ThreadState.BLOCKED);
                     blockedThread = runningThread;
                     runningThread = null;
-                    return true;
+                    break;
                 case FINISHED:
                     //runningThread.setState(ThreadState.FINISHED);
                     runningThread = null;
                     if (isFinished()) {
                         blockedThread = null; // no hace falta
                         setState(ThreadState.FINISHED);
-                        return true;
                     }
                     break;
             }
         }
-
-        return false;
     }
 
     /**

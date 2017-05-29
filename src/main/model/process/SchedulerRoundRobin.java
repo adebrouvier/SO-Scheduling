@@ -30,7 +30,7 @@ public class SchedulerRoundRobin extends Scheduler {
         if (!core.isRunning()) {
             quantumMap.put(core.getID(), 0);
             Process process = readyQueue.poll();
-            if (process == null) {
+            if (process == null || !process.hasAvailableKLT()) {
                 addOSStep();
                 return;
             }

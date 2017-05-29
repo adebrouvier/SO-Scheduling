@@ -20,7 +20,7 @@ public class SchedulerFIFO extends Scheduler {
         if (!core.isRunning()) {
             Process process = readyQueue.poll();
 
-            if (process == null) {
+            if (process == null || !process.hasAvailableKLT()) {
                 addOSStep();
                 return;
             }
