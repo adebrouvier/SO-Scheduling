@@ -9,6 +9,10 @@ public class SRT implements Algorithm {
     @Override
     public UserLevelThread execute(Queue<UserLevelThread> ults, UserLevelThread runningUlt, int core) {
 
+            if (runningUlt != null && !ults.contains(runningUlt)) {
+                runningUlt.setState(ThreadState.READY);
+                ults.add(runningUlt);
+            }
             UserLevelThread shortest = ults.peek();
             for (UserLevelThread thread : ults) {
                 if (thread.getCurrentBurst().getRemainingTime() < shortest.getCurrentBurst().getRemainingTime()) {
