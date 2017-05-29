@@ -71,12 +71,16 @@ public class Process {
     }
 
     public boolean hasAvailableKLT() {
+        boolean hasReadyKLT = false;
         for (KernelLevelThread klt : threads) {
-            if (!klt.isFinished() && klt.getState() == ThreadState.READY) {
-                return true;
+            if (klt.getState() == ThreadState.BLOCKED) {    // si un thread esta blocked to-do el process esta blocked
+                return false;
+            }
+            if (klt.getState() == ThreadState.READY) {
+                hasReadyKLT = true;
             }
         }
-        return false;
+        return hasReadyKLT;
     }
 
     @Override
@@ -145,5 +149,14 @@ public class Process {
         for (KernelLevelThread k : threads){
             k.update();
         }
+    }
+
+    public boolean allThreadsRunning() {
+        for (KernelLevelThread klt : threads) {
+            if (klt.getState() != ThreadState.RUNNING) {
+                return false;
+            }
+        }
+        return true;
     }
 }
