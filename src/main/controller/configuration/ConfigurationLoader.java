@@ -19,7 +19,7 @@ public class ConfigurationLoader {
     private String threadLibrary = "FIFO";
     private int cores=1;
     private int IOCount=1;
-    private int schedulingQuantum=1;
+    private int schedulingQuantum=0;
     private int threadQuantum=0;
 
     public ConfigurationLoader(String [] args){

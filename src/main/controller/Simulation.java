@@ -104,7 +104,7 @@ public class Simulation extends JPanel implements Runnable {
     public void run() {
         long timer = System.currentTimeMillis();
 
-        int step = 1000;
+        int step = 100;
 
         while (true) {
 

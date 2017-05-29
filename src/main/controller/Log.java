@@ -24,14 +24,14 @@ public final class Log {
     public static void addConfiguration(Configuration cfg) {
         int quantum = 0;
         String scheduler = cfg.getScheduling();
-        if (scheduler.equals("RR")) {
-            quantum = cfg.getSchedulingQuantum();
-        }
+        quantum = cfg.getSchedulingQuantum();
+
         getInstance().writeToFile(instance.logFilePath, "Scheduler: " + scheduler + (quantum != 0 ? ", quantum:" + quantum: ""));
+
         scheduler = cfg.getThreadLibrary();
-        if (scheduler.equals("RR")) {
-            quantum = cfg.getThreadQuantum();
-        }
+
+        quantum = cfg.getThreadQuantum();
+
         getInstance().writeToFile(instance.logFilePath, "Thread Library: " + scheduler + (quantum != 0 ? ", quantum:" + quantum: ""));
 
         getInstance().writeToFile(instance.logFilePath, "Cores: " +  cfg.getCores() + ", IO Devices: " + cfg.getIOCount());
