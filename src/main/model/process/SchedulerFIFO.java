@@ -61,7 +61,8 @@ public class SchedulerFIFO extends Scheduler {
                 core.setCurrentKLT(null);
                 if (process.isFinished()) {
                     process.setState(ProcessState.FINISHED);
-                } else if (process.hasAvailableKLT()){
+                } else if (process.hasAvailableKLT()) {
+                    process.setState(ProcessState.READY);
                     readyQueue.add(process);
                     return;
                 }
@@ -70,6 +71,7 @@ public class SchedulerFIFO extends Scheduler {
 
         if (cores.size() > 1) {
             if (process.hasAvailableKLT()) {
+                process.setState(ProcessState.READY);
                 readyQueue.add(process);
             }
         }
